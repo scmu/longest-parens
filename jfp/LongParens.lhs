@@ -1,3 +1,4 @@
+\RequirePackage{amsmath}
 \documentclass{jfp}
 
 % build using
@@ -8,12 +9,8 @@
 %include polycode.fmt
 %include Formatting.fmt
 
-\usepackage{amsmath}
 \usepackage{amsfonts}
-%\usepackage{mathpartir}
-%\usepackage{stmaryrd}
 \usepackage{hyperref}
-%\usepackage{scalerel}
 \usepackage{url}
 \usepackage{xcolor}
 \usepackage{subcaption}
