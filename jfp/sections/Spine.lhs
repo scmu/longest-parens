@@ -16,7 +16,7 @@ This is a hint that we should generalise the problem to consider trees that are 
 
 Consider the tree in Figure~\ref{fig:spine01}. Adding a subtree |s| to its left results in the tree in Figure~\ref{fig:spine02}.
 If we represent a tree by the leftmost subtree and the list of subtrees alone its left spine, the tree in Figure~\ref{fig:spine01} is represented by the list |[t,u,v,w]|,
-and adding a subtree is simply extending the list --- the tree in Figure~\ref{fig:spine02} can be represented by |[s,t,u,v,w]|.
+and adding a subtree is simply extending the list --- the tree in Figure~\ref{fig:spine02} is represented by |[s,t,u,v,w]|.
 Define the following \emph{spine tree}, a representation that allows us to easily extend trees to the lefthand side:
 \begin{code}
 type Spine = ListP Tree {-"~~,"-}
@@ -59,7 +59,7 @@ pr (roll ts) =  replicate (length ts - 1) '(' ++
                   foldrn (\t xs -> pr t ++ ")" ++ xs) pr ts {-"~~,"-}
 \end{spec}
 where |replicate n x| returns a list containing |n| copies of |x|.
-\end{lemma}
+\end{lemma}%
 The proof is a routine induction on the length of |ts|.
 Define
 \begin{code}
@@ -97,8 +97,9 @@ prS (Null : ts)      = ')' : prS ts
 prS (Fork t u : ts)  = '(' : prS (t : u : ts) {-"~~."-}
 \end{spec}
 
-We are now ready to invert |prS| by Theorem~\ref{thm:conv-fun}. We want to find |base| and |step| such that
-|prS base = ""| and |prS (step x ts) = x : prS ts| for |x = '('| or |')'|. Now that |prS| has been transformed into the form above, apparently |base = [Null]| and |step| can be defined by:
+We are now ready to invert |prS| by Theorem~\ref{thm:conv-fun},
+which amounts to finding |base| and |step| such that |prS base = ""| and |prS (step x ts) = x : prS ts| for |x = '('| or |')'|.
+Now that |prS| has been transformed into the form above, apparently |base = [Null]|, and |step| is given by:
 \begin{spec}
 step ')' ts = Null : ts
 step '(' (t : u : ts) = Fork t u : ts {-"~~."-}

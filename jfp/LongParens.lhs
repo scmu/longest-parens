@@ -42,11 +42,11 @@
 \doival{TODO}
 
 %% Title information
-\title{Longest Valid Segment of Parentheses:\\
+\title{Longest Segment of Balanced Parentheses:\\
 \large
 an Exercise in Program Inversion in a Segment Problem}
 \jnlDoiYr{2020}
-\titlerunning{Longest Valid Segment of Parentheses}
+\titlerunning{Longest Segment of Balanced Parentheses}
 
 \begin{authgrp}
   \author{Shin-Cheng Mu,~}

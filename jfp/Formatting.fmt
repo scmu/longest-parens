@@ -21,14 +21,24 @@
 \newcommand\Hide{\mathbin{\downarrow}}
 \newcommand\Reveal{\mathbin{\uparrow}}
 
-%format Nat = "\mathbb{N}"
-%format ListP a = "\lbrack" a "\rbrack^{+}"
+%% Typesetting standard symbols
 
 %format == = "\doubleequals"
 %format . = "\mathbin{\cdot}"
 %format `app` = "\mathbin{\$}"
 %format app = "(\mathbin{\$})"
 %format ++ = "\mathbin{+\!\!\!\!\!+}"
+
+%format <=> = "\mathrel{\Leftrightarrow}"
+%format === = "\mathbin{=}"
+
+%format *** = "\times"
+%format /=  = "\mathbin{\not\doubleequals}"
+
+%% Symbols that are convenient to have
+
+%format Nat = "\mathbb{N}"
+%format ListP a = "\lbrack" a "\rbrack^{+}"
 
 %format oplus = "(\oplus)"
 %format `oplus` = "\mathbin{\oplus}"
@@ -41,11 +51,9 @@
 %format `ominus` = "\mathbin{\ominus}"
 %format ominus = "(\ominus)"
 
-%format <=> = "\mathrel{\Leftrightarrow}"
-%format === = "\mathbin{=}"
+%% paper-specific declarations
 
-%format *** = "\times"
-%format /=  = "\mathbin{\not\doubleequals}"
+%format epsilon = "\epsilon"
 
 \makeatother
 \EndFmtInput

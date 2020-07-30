@@ -1,6 +1,6 @@
 \section{Converse-of-a-Function Theorem}
 
-The converse-of-a-function theorem, introduced by \cite{BirddeMoor:97:Algebra}, gives us conditions under which the \emph{relational converse}, a generalised notion of inverse, of a function can be written as a \emph{relational} fold of any initial datatype defined as a least fixed-point of a base functor.
+The converse-of-a-function theorem, introduced by \cite{BirddeMoor:97:Algebra}, gives us conditions under which the \emph{relational converse} --- a generalised notion of inverse --- of a function can be written as a \emph{relational} fold of any initial datatype defined as a least fixed-point of a base functor.
 For this paper we need only a simplified version that covers functional folds on lists:
 %{
 %format finv = "\Varid{f}^{-1}"
