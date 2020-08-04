@@ -10,6 +10,7 @@
 %include Formatting.fmt
 
 \usepackage{amsfonts}
+\usepackage{scalerel}
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{xcolor}
@@ -59,22 +60,19 @@ an Exercise in Program Inversion in a Segment Problem}
 \end{authgrp}
 
 % \begin{abstract}
-
 % \end{abstract}
 
-% \keywords{monads \and effect handlers \and equational reasoning \and nondeterminism \and state \and contextual equivalence}
+% \keywords{program inversion \and segment problem}
 
 \maketitle[F]
-
 
 %include sections/Intro.lhs
 %include sections/ConvFnThm.lhs
 %include sections/Spine.lhs
-
+%include sections/Longest.lhs
 
 %% Bibliography
 \bibliographystyle{JFPlike}
 \bibliography{LongParens}
-
 
 \end{document}
