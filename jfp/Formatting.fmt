@@ -34,6 +34,7 @@
 
 %format *** = "\times"
 %format /=  = "\mathbin{\not\doubleequals}"
+%format inv f = "{" f "}^{\hstretch{0.5}{-}1}"
 
 %% Symbols that are convenient to have
 

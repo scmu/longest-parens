@@ -8,6 +8,7 @@ import Intro
 
 \section{The Spine Tree}
 
+We have not yet given a formal definition of |parse :: String -> Tree|, other than informally stating that it is an inverse of |pr :: Tree -> String|.
 To find the right inverse of |pr| using Theorem~\ref{thm:conv-fun}, we have to find |step :: Char -> Tree -> Tree| such that
 |pr (step x t) = x : pr t|, where |x| is either |'('| or |')'|.
 One can see that there is no way this equality could hold: |pr| always returns strings containing balanced parentheses,
@@ -52,7 +53,7 @@ When it is represented this way, a newly added subtree becomes the sibling of |F
 How do we print a spine tree?
 Observe that the tree in Figure~\ref{fig:spine01} shall be printed as
 |"(((" ++ pr t ++ ")" ++ pr u ++ ")" ++ pr v ++ ")" ++ pr w|.
-For the general case, we claim that the following lemma is true:
+For general cases, we claim that the following lemma is true:
 \begin{lemma} For all |ts :: Spine|, we have
 \begin{spec}
 pr (roll ts) =  replicate (length ts - 1) '(' ++
@@ -68,7 +69,7 @@ prS = foldrn (\t xs -> pr t ++ ")" ++ xs) pr {-"~~."-}
 \end{code}
 That is, |prS ts| is |pr (roll ts)| without the leading left parentheses.
 When a spine tree contains merely a singleton tree, |prS [t]| equals |pr t|, which is a string of balanced parentheses.
-A spine tree |[t,u,v]| is printed as |pr t ++ ")" ++ pr u ++ ")" ++ pr v|, having two unmatched right parentheses, because we anticipate that more trees could be added.
+A spine tree |[t,u,v]| is printed as |pr t ++ ")" ++ pr u ++ ")" ++ pr v|, having two unmatched right parentheses, because we anticipate more trees to be added from the lefthand side.
 
 We now try to construct an inductive definition of |prS| that does not use |(++)| and does not rely on |pr|.
 For the base case, |prS [Null] = ""|.
@@ -104,11 +105,14 @@ Now that |prS| has been transformed into the form above, apparently |base = [Nul
 step ')' ts = Null : ts
 step '(' (t : u : ts) = Fork t u : ts {-"~~."-}
 \end{spec}
-In other words, if we define
+In other words, we have derived:
+%{
+%format invprS = "{" prS "}^{\hstretch{0.5}{-}1}"
 \begin{spec}
-build :: String -> Spine
-build "" = [Null]
-build (')':xs) = Null : build xs
-build ('(':xs) = case build xs of (t : u : ts) -> Fork t u : ts {-"~~,"-}
+invprS :: String -> Spine
+invprS "" = [Null]
+invprS (')':xs) = Null : build xs
+invprS ('(':xs) = case invprS xs of (t : u : ts) -> Fork t u : ts {-"~~,"-}
 \end{spec}
-We have that |prS (build ts) = ts| for all |ts| in the domain of |build|.
+We have that |prS (invprS ts) = ts| for all |ts| in the domain of |invprS|.
+%}
