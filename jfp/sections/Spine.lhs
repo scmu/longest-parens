@@ -8,7 +8,6 @@ import Intro
 
 \section{The Spine Tree}
 
-We have not yet given a formal definition of |parse :: String -> Tree|, other than informally stating that it is an inverse of |pr :: Tree -> String|.
 To find the right inverse of |pr| using Theorem~\ref{thm:conv-fun}, we have to find |step :: Char -> Tree -> Tree| such that
 |pr (step x t) = x : pr t|, where |x| is either |'('| or |')'|.
 One can see that there is no way this equality could hold: |pr| always returns strings containing balanced parentheses,
@@ -52,7 +51,9 @@ When it is represented this way, a newly added subtree becomes the sibling of |F
 
 How do we print a spine tree?
 Observe that the tree in Figure~\ref{fig:spine01} shall be printed as
-|"(((" ++ pr t ++ ")" ++ pr u ++ ")" ++ pr v ++ ")" ++ pr w|.
+|"(((t)u)v)w"|
+(where {\tt t} and {\tt u}, etc in typewriter font denote |pr t| and |pr u|).
+%|"(((" ++ pr t ++ ")" ++ pr u ++ ")" ++ pr v ++ ")" ++ pr w|.
 For general cases, we claim that the following lemma is true:
 \begin{lemma} For all |ts :: Spine|, we have
 \begin{spec}
@@ -69,7 +70,9 @@ prS = foldrn (\t xs -> pr t ++ ")" ++ xs) pr {-"~~."-}
 \end{code}
 That is, |prS ts| is |pr (roll ts)| without the leading left parentheses.
 When a spine tree contains merely a singleton tree, |prS [t]| equals |pr t|, which is a string of balanced parentheses.
-A spine tree |[t,u,v]| is printed as |pr t ++ ")" ++ pr u ++ ")" ++ pr v|, having two unmatched right parentheses, because we anticipate more trees to be added from the lefthand side.
+A spine tree |[t,u,v]| is printed as |"t)u)v"|,
+%|pr t ++ ")" ++ pr u ++ ")" ++ pr v|,
+having two unmatched right parentheses, because we anticipate more trees to be added from the lefthand side.
 
 We now try to construct an inductive definition of |prS| that does not use |(++)| and does not rely on |pr|.
 For the base case, |prS [Null] = ""|.
@@ -111,7 +114,7 @@ In other words, we have derived:
 \begin{spec}
 invprS :: String -> Spine
 invprS "" = [Null]
-invprS (')':xs) = Null : build xs
+invprS (')':xs) = Null : invprS xs
 invprS ('(':xs) = case invprS xs of (t : u : ts) -> Fork t u : ts {-"~~,"-}
 \end{spec}
 We have that |prS (invprS ts) = ts| for all |ts| in the domain of |invprS|.
