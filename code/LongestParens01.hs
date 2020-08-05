@@ -1,32 +1,35 @@
+import Data.List
+import Control.Arrow ((&&&))
+
 type List a = [a]
 
 -- S -> ( S ) S
-data S = E | B S S deriving (Eq, Show, Read)
+data Tree = N | F Tree Tree deriving (Eq, Show, Read)
 
-size :: S -> Int
-size E = 0
-size (B t u) = 2 + size t + size u
+size :: Tree -> Int
+size N = 0
+size (F t u) = 2 + size t + size u
 
-pr :: S -> String
-pr E = ""
-pr (B t u) = "(" ++ pr t ++ ")" ++ pr u
+pr :: Tree -> String
+pr N = ""
+pr (F t u) = "(" ++ pr t ++ ")" ++ pr u
 
-type Spine = List S
+type Spine = List Tree
 
-roll :: Spine -> S
+roll :: Spine -> Tree
 roll [t] = t
-roll (t:u:ts) = roll (B t u : ts)
+roll (t:u:ts) = roll (F t u : ts)
 
 prS :: Spine -> String
 prS [t] = pr t
 prS (t:ts) = pr t ++ ")" ++ prS ts
 
 build :: String -> Spine
-build "" = [E]
-build (')':xs) = E : build xs
+build "" = [N]
+build (')':xs) = N : build xs
 build ('(':xs) = case build xs of
-  [t] -> [E] --- ???
-  (t:u:ts) -> B t u : ts
+  [t] -> [N] --- ???
+  (t:u:ts) -> F t u : ts
 
   -- prS : generalised parse
   -- build : right inverse of prS
@@ -37,13 +40,13 @@ build ('(':xs) = case build xs of
 
 -- We have
 
---   prS [E] = ""
+--   prS [N] = ""
 --   prS (build (')':xs))
--- = prS (E : build xs)
+-- = prS (N : build xs)
 -- = ')' : prS (build xs)
 
 --   prS (build ('(':xs))
--- = case build xs of (t:u:ts) -> prS (B t u : ts)
+-- = case build xs of (t:u:ts) -> prS (F t u : ts)
 -- = case build xs of (t:u:ts) -> "(" ++ pr t ++ ")" ++ pr u ++ ")" ++ prS ts
 -- = case build xs of (t:u:ts) -> "(" ++ prS (t:u:ts)
 -- = '(' : prS (build xs)
@@ -51,23 +54,23 @@ build ('(':xs) = case build xs of
 
 -- longest valid parentheses
 
-lvp :: String -> S
-lvp = head . maxBy sizeS . scanr step [E]
-   where step ')' ts = E : ts
-         step '(' [t] = [E]
-         step '(' (t:u:ts) = B t u : ts
+lvp :: String -> Tree
+lvp = head . maxBy sizeS . scanr step [N]
+   where step ')' ts = N : ts
+         step '(' [t] = [N]
+         step '(' (t:u:ts) = F t u : ts
 
 sizeS (t:ts) = size t
 
 -- caching the size
 
-type Spine2 = List (S, Int)
+type Spine2 = List (Tree, Int)
 
-lvp2 :: String -> (S, Int)
-lvp2 = head . maxBy sizeS2 . scanr step [(E,0)]
-   where step ')' ts = (E,0) : ts
-         step '(' [t] = [(E,0)]
-         step '(' ((t,m):(u,n):ts) = (B t u, 2+m+n) : ts
+lvp2 :: String -> (Tree, Int)
+lvp2 = head . maxBy sizeS2 . scanr step [(N,0)]
+   where step ')' ts = (N,0) : ts
+         step '(' [t] = [(N,0)]
+         step '(' ((t,m):(u,n):ts) = (F t u, 2+m+n) : ts
 
 sizeS2 ((t,n):ts) = n
 
