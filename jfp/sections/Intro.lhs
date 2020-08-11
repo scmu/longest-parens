@@ -1,6 +1,10 @@
 %if False
 \begin{code}
+{-# LANGUAGE StandaloneDeriving #-}
 module Intro where
+
+import Data.List
+import Utilities
 \end{code}
 %endif
 
@@ -27,13 +31,13 @@ deriving instance Eq   Tree
 \end{code}
 %endif
 The problem can thus be specified by (|lbp| standing for ``longest balanced parentheses''):
-\begin{spec}
-  lbp = maxBy size . filtJust . map parse . segments {-"~~,"-}
+\begin{code}
+lbp = maxBy size . filtJust . map parse . segments {-"~~,"-}
 
-  segments = concat . map inits tails {-"~~,"-}
-  filtJust ts = [t | Just t <- ts] {-"~~,"-}
-  size t = length (pr t) {-"~~."-}
-\end{spec}
+segments = concat . map inits . tails {-"~~,"-}
+filtJust ts = [t | Just t <- ts] {-"~~,"-}
+size t = length (pr t) {-"~~."-}
+\end{code}
 The function |segments :: [a] -> [[a]]| returns all segments of a list, with |inits, tails :: [a] -> [[a]]| respectively compute all prefixes and suffixes of the input list.
 The function |parse :: String -> Maybe Tree| builds a parse tree ---
 |parse xs| should return |Just t| such that |pr t = xs| if |xs| is balanced, and return |Nothing| otherwise.
@@ -55,17 +59,23 @@ Given |f :: a -> b| where |b| is a type that is totally ordered, |maxBy f :: [a]
 \paragraph*{An initial derivation.}
 To derive an algorithm, we proceed by the usual routine.
 Finding an optimal segment is often factored into finding, for each suffix, an optimal prefix:
-\begin{spec}
-   maxBy size . filtJust . map parse . segments
-=    {- definition of |segments| -}
-   maxBy size . filtJust . map parse . concat . map inits . tails
-=    {- since |map f . concat = concat . map (map f)|, |map| fusion -}
-   maxBy size . filtJust . concat . map (map parse . inits) . tails
-=    {- since |filtJust . concat = concat . map filtJust| -}
-   maxBy size . concat . map (filtJust . map parse . inits) . tails
-=    {- since |maxBy f . concat = maxBy f . map (maxBy f)| -}
-   maxBy size . map (maxBy size . filtJust . map parse . inits) . tails {-"~~."-}
-\end{spec}
+%if False
+\begin{code}
+initDer0 :: String -> Tree
+initDer0 =
+\end{code}
+%endif
+\begin{code}
+      maxBy size . filtJust . map parse . segments
+ ===    {- definition of |segments| -}
+      maxBy size . filtJust . map parse . concat . map inits . tails
+ ===    {- since |map f . concat = concat . map (map f)|, |map| fusion -}
+      maxBy size . filtJust . concat . map (map parse . inits) . tails
+ ===    {- since |filtJust . concat = concat . map filtJust| -}
+      maxBy size . concat . map (filtJust . map parse . inits) . tails
+ ===    {- since |maxBy f . concat = maxBy f . map (maxBy f)| -}
+      maxBy size . map (maxBy size . filtJust . map parse . inits) . tails {-"~~."-}
+\end{code}
 That is, for each suffix returned by |tails|, we attempt to compute the longest prefix of balanced parentheses (as in |maxBy size . filtJust . map parse . inits|).
 
 The next step is usually to apply the ``scan lemma'':
@@ -81,13 +91,26 @@ a reasonable attempt is to use the fold-fusion theorem to fuse |maxBy size . fil
   |h . foldr f e = foldr g (h e)| if |h (f x y) = g x (h y)|.
 \end{theorem}
 Trying to satsify the condition for fusing |map parse| and |inits|:
-\begin{spec}
-   map parse ([] : map (x:) xss)
-=    {- since |parse [] = Just Null| -}
-   Just Null : map (parse . (x:)) xss
-=    {- wish, for some |g'| -}
-   Just Null : g' x (map parse xss) {-"~~,"-}
-\end{spec}
+%if False
+\begin{code}
+-- fuseCond0 :: String -> Tree
+fuseCond0 :: Char -> [String] -> [Maybe Tree]
+fuseCond0 x xss =
+\end{code}
+%endif
+\begin{code}
+      map parse ([] : map (x:) xss)
+ ===    {- since |parse [] = Just Null| -}
+      Just Null : map (parse . (x:)) xss
+ ===    {- wish, for some |g'| -}
+      Just Null : g' x (map parse xss) {-"~~,"-}
+\end{code}
+%if False
+\begin{code}
+  where g' :: Char -> [Maybe Tree] -> [Maybe Tree]
+        g' = undefined
+\end{code}
+%endif
 we wish |map (parse . (x:)) = g' x . map parse| for some |g'|.
 For that, we need |parse (x : xs) = g'' x (parse xs)| for some |g''|,
 that is, |parse| shall be a |foldr| too. Is that possible?
@@ -112,3 +135,16 @@ it would be helpful if there is a method to construct the inverse of a function 
 %            = Null  {-"\quad\mbox{, otherwise.}"-}
 % \end{spec}
 % We let |parse = total (inv pr)|.
+
+
+%if False
+\begin{code}
+maxBy f [x] = x
+maxBy f (x:y:xs) = maxBy f (mx x y : xs)
+    where mx x y | f x >= f y = x
+                 | otherwise  = y
+
+parse :: String -> Maybe Tree
+parse = undefined
+\end{code}
+%endif

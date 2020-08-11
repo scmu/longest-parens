@@ -37,6 +37,12 @@
 %format inv f = "{" f "}^{\hstretch{0.5}{-}1}"
 %format total f = "{" f "}^{\triangledown}"
 
+%format <=< = "\mathrel{\hstretch{0.7}{<\!\!\!=\!\!<}}"
+%format >=> = "\mathrel{\hstretch{0.7}{>\!\!=\!\!\!>}}"
+%format =<< = "\mathbin{\hstretch{0.7}{=\!\!<\!\!<}}"
+%format << = "\mathbin{\hstretch{0.7}{<\!\!<}}"
+%format >> = "\mathbin{\hstretch{0.7}{>\!\!>}}"
+%format >>= = "\mathrel{\hstretch{0.7}{>\!\!>\!\!=}}"
 %% Symbols that are convenient to have
 
 %format Nat = "\mathbb{N}"
