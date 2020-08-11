@@ -65,6 +65,14 @@ build ('(':xs) = case build xs of
     (t,[])   -> (N,[])
     (t,u:ts) -> (F t u, ts)
 
+--
+build' :: String -> Spine
+build' ""       = (N,[])
+build' (')':xs) = case build' xs of (t,ts) -> (N, [])
+build' ('(':xs) = case build' xs of
+    (t,[])   -> (N,[])
+    (t,u:ts) -> (F t u, ts)
+
 -- longest valid parentheses
 
 lvp :: String -> Tree
@@ -74,6 +82,12 @@ lvp = fst . maxBy sizeS . scanr step (N,[])
          step '(' (t, u:ts) = (F t u, ts)
 
 sizeS (t,ts) = size t
+
+lvp' :: String -> Tree
+lvp' = fst . maxBy sizeS . scanr step (N,[])
+   where step ')' (t, ts)   = (N,[])
+         step '(' (t, [])   = (N,[])
+         step '(' (t, u:ts) = (F t u, ts)
 
 -- caching the size
 
@@ -110,3 +124,5 @@ maxBy f (x:y:xs) = maxBy f (mx x y : xs)
 repeatN n = take n . repeat
 
 (f *** g) (x,y) = (f x, g y)
+
+segments = concat . map inits . tails
