@@ -45,7 +45,7 @@ It is related to the right inverse of |pr|,
 that is, the function |inv pr| such that |pr (inv pr xs) = xs|.
 The function |inv pr| is partial (e.g. there is no |t| such that |pr t = "((("|),
 while |parse| is the ``monadified'' variation of |inv pr|, using a |Maybe| monad to represent partialty.
-We will talk about how to construct |inv pr| and |parse| later.
+We will construct |parse| more formally in Section~\ref{sec:spine}.
 % It returns |Nothing| for inputs not in the domain of |inv pr|.
 % It may appear that it defeats the purpose if we assume that we can determine whether a input is in the domain of |inv pr|, but we will present a more precise definition later.
 

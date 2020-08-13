@@ -69,10 +69,15 @@ an Exercise in Program Inversion in a Segment Problem}
 %include sections/Intro.lhs
 %include sections/ConvFnThm.lhs
 %include sections/Spine.lhs
-%include sections/Longest.lhs
+%include sections/Foldify.lhs
+%include sections/Wrap.lhs
 
 %% Bibliography
 \bibliographystyle{JFPlike}
 \bibliography{LongParens}
+
+\appendix
+
+%include sections/Appendix.lhs
 
 \end{document}

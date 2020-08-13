@@ -62,6 +62,16 @@
 %% paper-specific declarations
 
 %format epsilon = "\epsilon"
+%format initsP = "\Varid{inits}_{+}"
+
+%% subscripted variables
+
+%format x0
+%format x1
+%format xn = "\Varid{x}_{\Varid{n}}"
+%format y0
+%format y1
+%format yn = "\Varid{y}_{\Varid{n}}"
 
 \makeatother
 \EndFmtInput

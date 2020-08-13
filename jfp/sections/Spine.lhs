@@ -8,6 +8,7 @@ import Utilities
 %endif
 
 \section{The Spine Tree}
+\label{sec:spine}
 
 Consider the tree in Figure~\ref{fig:spine01}. Adding a subtree |s| to its left results in the tree in Figure~\ref{fig:spine02}.
 If we represent a tree by the leftmost subtree and the list of subtrees alone its left spine, the tree in Figure~\ref{fig:spine01} is represented by |(t,[u,v,w])|,
@@ -159,3 +160,19 @@ parseS (x:xs)  = parseS xs >>= stepM x {-"~~,"-}
 where |stepM| is monadified |step| --- the case |(t,[])| missing in |step| is extended to returning |Nothing|.
 Note that another way to write the inductive case is
 |parseS (x:xs) = (stepM x <=< parseS) xs|, where |(<=<) :: (b -> M c) -> (a -> M b) -> (a -> M c)| is Kleisli composition, an operator we will use later.
+
+To relate |parseS| to |parse|, notice that |prS (t,[]) = pr t|.
+We therefore have |parse = unwrapM <=< parseS|,
+where |unwrapM (t,[]) = Just t|, otherwise |unwrap| returns |Nothing|.
+
+%if False
+\begin{code}
+unwrapM (t,[]) = Just t
+unwrapM _      = Nothing
+
+stepM :: Char -> Spine -> Maybe Spine
+stepM ')' (t, ts)      = Just (Null, t:ts)
+stepM '(' (t, [])      = Nothing
+stepM '(' (t, u : ts)  = Just (Fork t u, ts)
+\end{code}
+%endif

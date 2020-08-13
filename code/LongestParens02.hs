@@ -57,6 +57,12 @@ prSinv ""       = (N,[])
 prSinv (')':xs) = case prSinv xs of (t,ts) -> (N, t:ts)
 prSinv ('(':xs) = case prSinv xs of (t,u:ts) -> (F t u, ts)
 
+parseS :: String -> Maybe Spine
+parseS ""       = Just (N,[])
+parseS (')':xs) = parseS xs >>= \(t,ts) -> Just (N, t:ts)
+parseS ('(':xs) = parseS xs >>= \ss ->
+   case ss of (t,u:ts) -> Just (F t u, ts)
+              (t,[]) -> Nothing
 
 build :: String -> Spine
 build ""       = (N,[])
