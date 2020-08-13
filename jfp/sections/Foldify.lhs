@@ -39,7 +39,7 @@ unwrap _      = Null
 %endif
 The last step is a routine calculation whose purpose is to factor the postprocessing |unwarpM| out of the main computation.
 We introduce |unwrap :: Spine -> Tree|, defined by |unwrap (t,[]) = t| and for all other input it returns |Null|, the smallest tree.
-After the transformation above, |maxBy| chooses an maximum element by |size . unwrap|.
+After the transformation above, |maxBy| chooses a maximum element by |size . unwrap|.
 That is, two spine trees |(t,[])| and |(u,[])| are compared by the sizes of |t| and |u|, while |(t,u:ts)| is treated the same as |Null|.
 
 % In the second expression, for each prefix of the input we try to build a spine tree by |praseS|; |unwrapM| then chooses only those having the form |(t,[])|.
@@ -56,8 +56,9 @@ We denote the binary operator that chooses a lexicographically larger spine by |
 
 On the second generalisation, recall the definition of |parseS|.
 In the |('(':xs)| case, when the recursive call returns |(t,[])|, we abort the computation by returning |Nothing|.
-This means that the information computed so far is disposed of, which is not good if we wish to
-process all prefixes in a single |foldr|.
+This means that the information computed so far is disposed of,
+while if we wish to
+process all prefixes in a single |foldr| we would need some accumulated results.
 The following function |build| returns |(Null, [])| in this case, allowing the computation to  carry on:
 % \begin{spec}
 % build :: String -> Spine
@@ -69,9 +70,9 @@ The following function |build| returns |(Null, [])| in this case, allowing the c
 \begin{code}
 build :: String -> Spine
 build = foldr bstep (Null,[]) {-"~~,"-}
- where  bstep ')' (t,ts)    = (Null, t:ts)
-        bstep '(' (t,[])    = (Null,[])
-        bstep '(' (t,u:ts)  = (Fork t u, ts) {-"~~."-}
+  where  bstep ')' (t,ts)    = (Null, t:ts)
+         bstep '(' (t,[])    = (Null,[])
+         bstep '(' (t,u:ts)  = (Fork t u, ts) {-"~~."-}
 \end{code}
 %if False
 \begin{code}
@@ -108,9 +109,9 @@ bl = undefined
 \end{code}
 %endif
 
-An informal explanation is that using |build| instead of |parseS| does not adding anything new to the collection of spine trees.
+An informal explanation is that using |build| instead of |parseS| does not add anything new to the collection of spine trees.
 Figure~\ref{fig:parseSvsBuild} shows the results of |parseS| and |build| for each prefix of |"())()("|, where |Just|, |Null|, and |Fork| are respectively abbreviated to |J|, |N|, and |F|.
-We can see that there are three prefixes where |parseS| returns |Nothing| while |build| yields a spine.
+We can see that there are three prefixes for which |parseS| returns |Nothing|, while |build| yields a spine.
 All of these spines, however, are what |parseS| would return for some other prefix anyway.
 Using |fst . largest| instead of |maxBy (size . unwrap)| is safe too: if |(F N N,[F N N])| is chosen by lexicographic ordering, the spine |(F N N, [])| must be a result of some prefix, and either way the optimal tree is |F N N|.
 \begin{figure}[t]
@@ -153,7 +154,7 @@ fuseCond1 x xss =
       bstep x (largest (map build xss)) {-"~~."-}
 \end{code}
 It is for the last step that we generalised to lexicographical ordering.
-The monotonicity would not hold if we compare only the first tree.
+The monotonicity would not hold if we had compared only the first tree.
 
 We therefore conclude that
 |largest . map build . inits = foldr bstep (Null, []) = build|.

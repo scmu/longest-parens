@@ -14,6 +14,7 @@ import Utilities
 Given a string of parentheses, the task is to find a longest consecutive segment that is properly bracketed.
 For example, for input |"))(()())())()("| the output should be |"(()())()"|.
 We also consider a reduced version of the problem in which we return only the length of the segment.
+\footnote{The length-only version was possibly used as an interview problem, collected in, for example, \url{https://leetcode.com/problems/longest-valid-parentheses/}.}
 
 For an initial specification, balanced parentheses can be captured by a number of grammars that are equivalent, for example |S -> epsilon || (S) || SS|, or |S -> epsilon || (S)S|. We choose the latter because it is both concise and unambiguous. Its parse tree can be represented in Haskell as below,
 with a function |pr| specifying how a tree is printed:
@@ -56,6 +57,7 @@ Given |f :: a -> b| where |b| is a type that is totally ordered, |maxBy f :: [a]
 %Finally, |size t| computes the length of |pr t|.
 % Specification of the ``length only'' problem is simply |size . lbp|.
 
+The length-only problem can be specified by |lbpl = size . lbp|.
 
 \paragraph*{An initial derivation.}
 To derive an algorithm, we proceed by the usual routine.
@@ -80,9 +82,17 @@ initDer0 =
 That is, for each suffix returned by |tails|, we attempt to compute the longest prefix of balanced parentheses (as in |maxBy size . filtJust . map parse . inits|).
 
 The next step is usually to apply the ``scan lemma'':
-|map (foldr oplus e) . tails = scanr oplus e|.
+\begin{lemma}
+\label{lma:scan-lemma}
+|map (foldr oplus e) . tails = scanr oplus e|, where
+\begin{spec}
+scanr oplus e []      = [e]
+scanr oplus e (x:xs)  = let (y:ys) = scanr oplus e xs in (x `oplus` y) : y : ys {-"~~."-}
+\end{spec}
+\end{lemma}
 If we can turn |maxBy size . filtJust . map parse . inits| into a |foldr|,
-the algorithm can proceed in a |scanr|. And if |oplus| is a constant-time operation, we get a linear-time algorithm.
+%the algorithm can proceed in a |scanr|.
+and if |oplus| is a constant-time operation, we get a linear-time algorithm.
 Since |inits| is a |foldr| --- |inits = foldr (\x xss -> [] : map (x:) xss) [[]]|,
 % \begin{spec}
 %   inits = foldr (\x xss -> [] : map (x:) xss) [[]] {-"~~,"-}

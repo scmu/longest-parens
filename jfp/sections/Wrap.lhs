@@ -27,7 +27,7 @@ initDer1 =
  ===    {- Section~\ref{sec:foldify} -}
       maxBy size . map (fst . foldr bstep (Null,[])) . tails
  ===  fst . maxBy (size . fst) . map (foldr bstep (Null,[])) . tails
- ===    {- scan lemma -}
+ ===    {- Lemma~\ref{lma:scan-lemma} -}
       fst . maxBy (size . fst) . scanr bstep (Null,[]) {-"~~."-}
 \end{code}
 We have therefore derived:
@@ -44,8 +44,7 @@ lbp = fst . maxBy (size . fst) . scanr bstep (Null,[]) {-"~~."-}
 %endif
 To avoid recomputing the sizes each time, we can annotate each tree by its size: letting |Spine = ((Tree, Int), [(Tree, Int)])| and resulting in the following program:
 \begin{code}
-lbp' :: String -> (Tree, Int)
-lbp' = fst . maxBy (snd . fst) . scanr bstep ((Null,0),[]) {-"~~,"-}
+lbp' = fst . fst . maxBy (snd . fst) . scanr bstep ((Null,0),[]) {-"~~,"-}
    where  bstep ')' (t,ts)  = ((Null,0),t:ts)
           bstep '(' (t,[])  = ((Null,0),[])
           bstep '(' ((t,m),(u,n):ts) = ((Fork t u, 2+m+n),ts) {-"~~."-}

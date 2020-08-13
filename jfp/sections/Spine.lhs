@@ -13,9 +13,9 @@ import Utilities
 Consider the tree in Figure~\ref{fig:spine01}. Adding a subtree |s| to its left results in the tree in Figure~\ref{fig:spine02}.
 If we represent a tree by the leftmost subtree and the list of subtrees alone its left spine, the tree in Figure~\ref{fig:spine01} is represented by |(t,[u,v,w])|,
 and adding a subtree is simply extending the list --- the tree in Figure~\ref{fig:spine02} is represented by |(s,[t,u,v,w])|.
-Define the following \emph{spine tree}, a representation that allows us to easily extend trees to the lefthand side:
+Define the following \emph{spine tree}, a representation that allows us to easily extend trees to the lefthand side (similar techniques was used by, for example \cite{MuBird:03:Theory}, to build trees in a |foldr|.):
 \begin{code}
-type Spine = (Tree,[Tree]) {-"~~,"-}
+type Spine = (Tree,[Tree]) {-"~~."-}
 \end{code}
 The following function rolls a spine tree back to an ordinary tree:
 \begin{code}
@@ -49,30 +49,37 @@ Observe that the tree in Figure~\ref{fig:spine01} shall be printed as
 |"(((t)u)v)w"|
 (where {\tt t} and {\tt u}, etc in typewriter font denote |pr t| and |pr u|).
 %|"(((" ++ pr t ++ ")" ++ pr u ++ ")" ++ pr v ++ ")" ++ pr w|.
-For general cases, we claim that the following lemma is true:
-\begin{lemma} For all |ts :: Spine|, we have
+For general cases, we claim that for all |ts :: Spine| we have
+%the following lemma is true:
+%\begin{lemma} For all |ts :: Spine|, we have
 %if False
 \begin{code}
 propPrRoll :: Tree -> [Tree] -> String
 propPrRoll t ts =
-\end{code}
-%endif
-\begin{code}
  pr (roll (t,ts)) ===  replicate (length ts) '(' ++ pr t ++
                          foldr (\u xs -> ")" ++ pr u ++ xs) "" ts {-"~~,"-}
 \end{code}
+%endif
+\begin{equation}
+\begin{split}
+ |pr (roll (t,ts))| &= |replicate (length ts) '(' ++ pr t {-"\,"-}++| \\
+                    & \qquad |foldr (\u xs -> ")" ++ pr u ++ xs) "" ts| \mbox{~~.}
+\end{split}
+\label{eq:pr-roll}
+\end{equation}
 where |replicate n x| returns a list containing |n| copies of |x|.
-\end{lemma}%
-The proof is a routine induction on the length of |ts|.
-Define
+%\end{lemma}%
+Proof of \eqref{eq:pr-roll} is a routine induction on the length of |ts|.
+
+Let |prS (t,ts)| be |pr (roll (t,ts))| without the leading left parentheses:
 \begin{code}
 prS :: Spine -> String
 prS (t,ts) = pr t ++ foldr (\u xs -> ")" ++ pr u ++ xs) "" ts{-"~~."-}
 \end{code}
-That is, |prS s| is |pr (roll s)| without the leading left parentheses.
 When a spine tree contains merely a singleton tree, |prS (t,[])| equals |pr t|, which is a string of balanced parentheses.
 A spine tree |(t,[u,v])| is printed as |"t)u)v"|,
 having two unmatched right parentheses, because we anticipate more trees to be added from the lefthand side.
+While |inv pr| cannot be a |foldr|, we can construct |inv prS| as a fold.
 
 We now try to construct an inductive definition of |prS| that does not use |(++)| and does not rely on |pr|.
 For a base case, |prS (Null,[]) = ""|.
@@ -132,8 +139,8 @@ prSi ('(':xs)  = case prSi xs of (t, u : ts)  -> (Fork t u, ts) {-"~~,"-}
 \end{code}
 which is pleasingly symmetrical to |prS|.
 For some intuition how the tree construction works,
-when we see a |')'| we start a new tree, thus we shift |t| to the right and start freshly with |Null|;
-when we see a |'('|, it ought to be the leftmost symbol of some |"(t)u"|,
+a right parenthesis |')'| indicates starting a new tree, thus we shift |t| to the right and start freshly with |Null|;
+a left parenthesis |'('| ought to be the leftmost symbol of some |"(t)u"|,
 thus we wrap the two most recent siblings into one tree.
 When there are no such two siblings (that is, |inv prS xs = (t,[])|), the construction fails.
 % In other words, we have derived:
@@ -158,12 +165,12 @@ parseS (x:xs)  = parseS xs >>= stepM x {-"~~,"-}
          stepM '(' (t, u : ts)  = Just (Fork t u, ts) {-"~~,"-}
 \end{code}
 where |stepM| is monadified |step| --- the case |(t,[])| missing in |step| is extended to returning |Nothing|.
-Note that another way to write the inductive case is
-|parseS (x:xs) = (stepM x <=< parseS) xs|, where |(<=<) :: (b -> M c) -> (a -> M b) -> (a -> M c)| is Kleisli composition, an operator we will use later.
+% Note that another way to write the inductive case is
+% |parseS (x:xs) = (stepM x <=< parseS) xs|, where |(<=<) :: (b -> M c) -> (a -> M b) -> (a -> M c)| is Kleisli composition, an operator we will use later.
 
 To relate |parseS| to |parse|, notice that |prS (t,[]) = pr t|.
 We therefore have |parse = unwrapM <=< parseS|,
-where |unwrapM (t,[]) = Just t|, otherwise |unwrap| returns |Nothing|.
+where where |(<=<) :: (b -> M c) -> (a -> M b) -> (a -> M c)| is Kleisli composition, and |unwrapM (t,[]) = Just t|, otherwise |unwrapM| returns |Nothing|.
 
 %if False
 \begin{code}
