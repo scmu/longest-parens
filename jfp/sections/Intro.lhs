@@ -9,6 +9,7 @@ import Utilities
 %endif
 
 \section{Introduction}
+\label{sec:intro}
 
 Given a string of parentheses, the task is to find a longest consecutive segment that is properly bracketed.
 For example, for input |"))(()())())()("| the output should be |"(()())()"|.
@@ -88,6 +89,7 @@ Since |inits| is a |foldr| --- |inits = foldr (\x xss -> [] : map (x:) xss) [[]]
 % \end{spec}
 a reasonable attempt is to use the fold-fusion theorem to fuse |maxBy size . filtJust . map parse| into |inits|, to form a single |foldr|:
 \begin{theorem}[|foldr|-fusion]
+\label{thm:foldr-fusion}
   |h . foldr f e = foldr g (h e)| if |h (f x y) = g x (h y)|.
 \end{theorem}
 Trying to satsify the condition for fusing |map parse| and |inits|:

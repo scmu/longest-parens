@@ -12,7 +12,7 @@ import Utilities
 %endif
 
 \section{Optimal Prefix in a Fold}
-\label{sec:longest}
+\label{sec:foldify}
 
 Recall that our objective is to turn
 |maxBy size . filtJust . map parse . inits| into a |foldr|, posssibly by |foldr|-fusion.
@@ -48,17 +48,17 @@ That is, two spine trees |(t,[])| and |(u,[])| are compared by the sizes of |t| 
 % The rationale for doing this transformation is to to delay a destructive operation (removing non-singleton spines), keeping more information in the early stage of computation, to make |foldr|-fusion possible.
 
 For reason to be clear later, however, we need two generalisations.
-Firstly, we compare spine trees by \emph{lexicographic order}, that is
+Firstly, we compare spine trees by \emph{lexicographic ordering}, that is
 |(t,ts)| and |(u,us)| are compared first by comparing sizes of |t| and |u|.
 If |size t = size u|, we then compare the first trees in |ts| and |us|, and so on.
 An empty list is considered smaller than a non-empty list.
-We denote the binary operator that chooses a lexicographically larger spine by |oplus :: Spine -> Spine -> Spine|, and define |largest = foldr oplus (Null,[])|.
+We denote the binary operator that chooses a lexicographically larger spine by |bl :: Spine -> Spine -> Spine|, and define |largest = foldr bl (Null,[])|.
 
 On the second generalisation, recall the definition of |parseS|.
 In the |('(':xs)| case, when the recursive call returns |(t,[])|, we abort the computation by returning |Nothing|.
 This means that the information computed so far is disposed of, which is not good if we wish to
 process all prefixes in a single |foldr|.
-The following function |build| returns |(Null, [])| in this case, allowing the computation to reset and carry on:
+The following function |build| returns |(Null, [])| in this case, allowing the computation to  carry on:
 % \begin{spec}
 % build :: String -> Spine
 % build ""        = (Null,[])
@@ -73,6 +73,14 @@ build = foldr bstep (Null,[]) {-"~~,"-}
         bstep '(' (t,[])    = (Null,[])
         bstep '(' (t,u:ts)  = (Fork t u, ts) {-"~~."-}
 \end{code}
+%if False
+\begin{code}
+bstep :: Char -> Spine -> Spine
+bstep ')' (t,ts)    = (Null, t:ts)
+bstep '(' (t,[])    = (Null,[])
+bstep '(' (t,u:ts)  = (Fork t u, ts) {-"~~."-}
+\end{code}
+%endif
 For example,
 |parseS "))(" = Nothing|, while |build "))(" = (Null,[Null,Null])| ---
 the same result |build| and |parseS| would return for |"))"|.
@@ -93,19 +101,18 @@ optPreProp0 =
     fst . largest . map build . inits
 
 largest :: [Spine] -> Spine
-largest = undefined
+largest = foldr bl (Null,[])
 
 bl :: Spine -> Spine -> Spine
 bl = undefined
 \end{code}
 %endif
-%format bl = "(\oplus)"
-%format `bl` = "\oplus"
 
 An informal explanation is that using |build| instead of |parseS| does not adding anything new to the collection of spine trees.
 Figure~\ref{fig:parseSvsBuild} shows the results of |parseS| and |build| for each prefix of |"())()("|, where |Just|, |Null|, and |Fork| are respectively abbreviated to |J|, |N|, and |F|.
-We can see that there are three cases where |parseS| returns |Nothing| while |build| yields a value. All of them, however, are values |parseS| would return for other prefixes anyway.
-Using |fst . largest| is safe too: if |(F N N,[F N N])| is chosen by lexicographic ordering, the spine |(F N N, [])| must be a result of some prefix. Either way the optimal tree is |F N N|.
+We can see that there are three prefixes where |parseS| returns |Nothing| while |build| yields a spine.
+All of these spines, however, are what |parseS| would return for some other prefix anyway.
+Using |fst . largest| instead of |maxBy (size . unwrap)| is safe too: if |(F N N,[F N N])| is chosen by lexicographic ordering, the spine |(F N N, [])| must be a result of some prefix, and either way the optimal tree is |F N N|.
 \begin{figure}[t]
 {\small
 \begin{center}
@@ -127,17 +134,26 @@ Using |fst . largest| is safe too: if |(F N N,[F N N])| is chosen by lexicograph
 \end{figure}
 
 Formally proving \eqref{eq:largest-build-intro}, however, is a tricky task.
-It turns out that we need to prove a generalisation, recorded in Appendix~\ref{sec:largest-build-gen}.
+It turns out that we need to prove a non-trivial generalisation, recorded in Appendix~\ref{sec:largest-build-gen}.
 
-Now we are ready to fuse |largest . map build| into |inits|.
+Now we are ready to fuse |largest . map build| into |inits| by Theorem~\ref{thm:foldr-fusion}.
+To prove the fusion condition we calculate:
+%if False
 \begin{code}
-      largest . map build $ ([] : map (x:) xss)
+fuseCond1 :: Char -> [String] -> Spine
+fuseCond1 x xss =
+\end{code}
+%endif
+\begin{code}
+      largest (map build ([] : map (x:) xss))
  ===  (Null, []) `bl` largest (map (build . (x:)) xss)
- ===    {- |build| is a |foldr| -}
+ ===    {- |(Null, []) `bl` t = t|, and |build| is a |foldr| -}
       largest (map (bstep x . build) xss)
  ===    {- monotonicity: |largest . map bstep x = bstep x . largest| -}
       bstep x (largest (map build xss)) {-"~~."-}
 \end{code}
+It is for the last step that we generalised to lexicographical ordering.
+The monotonicity would not hold if we compare only the first tree.
 
 We therefore conclude that
-|largest . map build . inits = foldr bstep (Null, [])|.
+|largest . map build . inits = foldr bstep (Null, []) = build|.

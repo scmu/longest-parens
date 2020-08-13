@@ -63,6 +63,8 @@
 
 %format epsilon = "\epsilon"
 %format initsP = "\Varid{inits}_{+}"
+%format bl = "(\oplus)"
+%format `bl` = "\oplus"
 
 %% subscripted variables
 
