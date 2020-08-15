@@ -12,39 +12,93 @@ import Utilities
 \end{code}
 %endif
 
-\section{Appendix}
+\section*{Appendix}
 \label{sec:largest-build-gen}
+
+Regarding proving \eqref{eq:largest-build-intro}.
+We notice two properties:
+\begin{enumerate}
+\item |parseS xs| is either |Nothing|, or |Just (build xs)|,
+\item if |parseS xs| is |Nothing|, |build xs = build xs'| for some proper
+   prefix |xs'| of |xs|.
+\end{enumerate}
+%format mx = "\Varid{max}"
+Let |oplus :: Spine -> Spine -> Spine| be any binary operator that is associative, commutative, and idempotent, with identity |(Null,[])|, and let |mx = foldr oplus (Null,[])|.
+The two properties above imply that for all |ys| and |x|:
+\begin{equation}
+\begin{split}
+& |(mx . map build . inits) ys `bl` pickJust (parseS (ys++[x]))|~=\\
+& \quad |(mx . map build . inits) ys `bl` build (ys++[x])| \mbox{~~.}
+\end{split}
+\label{eq:build-shadow}
+\end{equation}
+%if False
+\begin{code}
+buildInitsShadow :: String -> Char -> Spine
+buildInitsShadow ys x =
+ (mx . map build . inits) ys `bl` pickJust (parseS (ys++[x])) ===
+  (mx . map build . inits) ys `bl` build (ys++[x])
+
+pickJust :: Maybe Spine -> Spine
+pickJust (Just t) = t
+pickJust Nothing = (Null, [])
+
+ml :: Spine -> Spine -> Spine
+ml = undefined
+
+mx = foldr ml (Null,[])
+\end{code}
+%endif
+where |pickJust :: Maybe Spine -> Spine| extracts the spine if the input is wrapped by |Just|, otherwise returns |Nothing|.
 
 Let |bsteps [y0,y1..yn] = bstep y0 . bstep y1 ... bstep yn|,
 and |stepsM [y0,y1..yn] = stepM y0 <=< stepM y1 ... <=< stepM yn|.
+The generalisation we can prove is:
 \begin{equation}
 \begin{split}
-&  |fst ((largest . map build . inits) ys `oplus`| \\
-& \qquad |(maxBy (size . unwrap) . filtJust . map (stepsM ys <=< parseS) . initsP) xs) ===|\\
-& ~~|fst ((largest . map build . inits) ys `oplus`| \\
-& ~~\qquad |(largest . map (bsteps ys . build) . initsP) xs)| ~~\mbox{~~.}
+&  |(mx . map build . inits) ys {-"\,"-} `ml`| \\
+& \qquad |(mx . filtJust . map (stepsM ys <=< parseS) . initsP) xs ===|\\
+& ~~|(mx . map build . inits) ys {-"\,"-} `ml`| \\
+& ~~\qquad |(mx . map (bsteps ys . build) . initsP) xs| ~~\mbox{~~,}
 \end{split}
 \label{eq:largest-build-gen}
 \end{equation}
-
 %if False
 \begin{code}
 largestBuildGen :: String -> String -> Tree
 largestBuildGen ys xs =
   fst ((largest . map build . inits) ys `bl`
         (maxBy (size . unwrap) . filtJust . map (stepsM ys <=< parseS) . initsP) xs) ===
-  fst ((largest . map build . inits) ys `bl`
-        (largest . map (bsteps ys . build) . initsP) xs)
+  fst ((largest . map build . inits) ys `bl` (largest . map (bsteps ys . build) . initsP) xs)
 \end{code}
 %endif
+where |initsP| returns \emph{non-empty} prefixes of the input list.
+When |ys := []|, \eqref{eq:largest-build-gen} reduces to
+|mx . filtJust . map parseS . inits === mx . map build . inits|,
+a slight generalisation of \eqref{eq:largest-build-intro}.
+
+We show the inductive case:
+%if False
+\begin{code}
+largestBuildGenInd ys x xs =
+\end{code}
+%endif
+\begin{code}
+      (mx . map build . inits) ys `bl`
+        (mx . filtJust . map (stepsM ys <=< parseS) . initsP) (x:xs)
+ ===  (mx . map build . inits) ys `bl` pickJust (parseS (ys ++ [x])) `bl`
+        (mx . filtJust . map (stepsM ys <=< parseS) . initsP) xs
+ ===    {- by \eqref{eq:build-shadow} -}
+      (mx . map build . inits) ys `bl` build (ys ++ [x]) `bl`
+        (mx . filtJust . map (stepsM ys <=< parseS) . initsP) xs
+ ===    {- induction -}
+      (mx . map build . inits) ys `bl` build (ys ++ [x]) `bl`
+        (mx . map (bsteps ys . build) . initsP) xs
+ ===  (mx . map build . inits) ys `bl` (mx . map (bsteps ys . build) . initsP) (x:xs) {-"~~."-}
+\end{code}
 
 %if False
 \begin{code}
-bstep :: Char -> Spine -> Spine
-bstep ')' (t,ts)    = (Null, t:ts)
-bstep '(' (t,[])    = (Null,[])
-bstep '(' (t,u:ts)  = (Fork t u, ts)
-
 bsteps :: String -> Spine -> Spine
 bsteps [] = id
 bsteps (x:xs) = bstep x . bsteps xs

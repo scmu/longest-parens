@@ -42,13 +42,16 @@ lbp = fst . maxBy (size . fst) . scanr bstep (Null,[]) {-"~~."-}
           bstep '(' (t, u:ts)  = (Fork t u, ts) {-"~~."-}
 \end{code}
 %endif
-To avoid recomputing the sizes each time, we can annotate each tree by its size: letting |Spine = ((Tree, Int), [(Tree, Int)])| and resulting in the following program:
+To avoid recomputing the sizes each time, we can annotate each tree by its size: letting |Spine = ((Tree, Int), [(Tree, Int)])|, resulting in the an algorithm that runs in linear-time:
+%{
+%format lbp' = lbp
 \begin{code}
 lbp' = fst . fst . maxBy (snd . fst) . scanr bstep ((Null,0),[]) {-"~~,"-}
    where  bstep ')' (t,ts)  = ((Null,0),t:ts)
           bstep '(' (t,[])  = ((Null,0),[])
           bstep '(' ((t,m),(u,n):ts) = ((Fork t u, 2+m+n),ts) {-"~~."-}
 \end{code}
+%} %lbp'
 Finally, the size-only version can be obtained by fusing |size| into |lbp|.
 It turns out that we do not need to keep the actual tree, but only their sizes ---
 |Spine = (Int, [Int])|:

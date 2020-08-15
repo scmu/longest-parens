@@ -29,7 +29,8 @@
 %format app = "(\mathbin{\$})"
 %format ++ = "\mathbin{+\!\!\!\!\!+}"
 
-%format <=> = "\mathrel{\Leftrightarrow}"
+%format <=> = "\mathrel{\equiv}"
+%format ==> = "\mathrel{\Rightarrow}"
 %format === = "\mathbin{=}"
 
 %format *** = "\times"
@@ -58,6 +59,10 @@
 %format ocirc = "(\circledcirc)"
 %format `ominus` = "\mathbin{\ominus}"
 %format ominus = "(\ominus)"
+%format unlhd = "(\unlhd)"
+%format `unlhd` = "\mathrel{\unlhd}"
+%format preceq = "(\preceq)"
+%format `preceq` = "\mathrel{\preceq}"
 
 %% paper-specific declarations
 
@@ -65,6 +70,8 @@
 %format initsP = "\Varid{inits}_{+}"
 %format bl = "(\oplus)"
 %format `bl` = "\oplus"
+%format ml = "(\oplus)"
+%format `ml` = "\oplus"
 
 %% subscripted variables
 
