@@ -1,6 +1,6 @@
 \section{Converse-of-a-Function Theorem}
 
-The converse-of-a-function theorem, introduced by \cite{BirddeMoor:97:Algebra}, gives us conditions under which the \emph{relational converse} --- a generalised notion of inverse --- of a function can be written as a \emph{relational} fold of any initial datatype defined as a least fixed-point of a base functor.
+The converse-of-a-function theorem \citep{BirddeMoor:97:Algebra, deMoorGibbons:00:Pointwise} gives us conditions under which the \emph{relational converse} --- a generalised notion of inverse --- of a function can be written as a \emph{relational} fold of any initial datatype defined as a least fixed-point of a base functor.
 For this paper we need only a simplified version that covers functional folds on lists:
 %{
 %format finv = "\Varid{f}^{-1}"
@@ -24,6 +24,9 @@ then |inv f = foldr step base xs| is a partial right inverse of |f|. That is, we
 % We also have a variation of the theorem where the condition on |base| is replaced by |f (base x) = [x]|.
 
 % \todo{A simpler example, or trim some parts of this section off if they are not necessary.}
+
+While the relational, generic version of the theorem was not trivial to prove,
+proof of the functional version above is a simple induction on the input list.
 
 To find the right inverse of |pr| using Theorem~\ref{thm:conv-fun}, we have to find |step :: Char -> Tree -> Tree| such that
 |pr (step x t) = x : pr t|, where |x| is either |'('| or |')'|.

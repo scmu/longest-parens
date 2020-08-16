@@ -77,8 +77,9 @@ an Exercise in Program Inversion in a Segment Problem}
 \bibliography{LongParens}
 
 \appendix
-\renewcommand{\appendixname}{A}
-\renewcommand{\theequation}{A.\arabic{equation}}
+\renewcommand{\thesection}{\Alph{section}}
+% \renewcommand{\appendixname}{A}
+% \renewcommand{\theequation}{A.\arabic{equation}}
   % redefine the command that creates the equation no.
 \setcounter{equation}{0}  % reset counter
 %include sections/Appendix.lhs

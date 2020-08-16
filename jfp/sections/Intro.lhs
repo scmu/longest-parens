@@ -53,7 +53,7 @@ We will construct |parse| more formally in Section~\ref{sec:spine}.
 
 The result of |map parse| is passed to |filtJust :: [Maybe a] -> [a]|, which chooses only those elements wrapped by |Just|.
 For this problem |filtJust| always returns a non-empty list, because the empty string can always be parsed to |Just Null|.
-Given |f :: a -> b| where |b| is a type that is totally ordered, |maxBy f :: [a] -> a| picks a maximum element from the input.
+Given |f :: a -> b| where |b| is a type that is ordered, |maxBy f :: [a] -> a| picks a maximum element from the input.
 %Finally, |size t| computes the length of |pr t|.
 % Specification of the ``length only'' problem is simply |size . lbp|.
 
@@ -79,7 +79,7 @@ initDer0 =
  ===    {- since |maxBy f . concat = maxBy f . map (maxBy f)| -}
       maxBy size . map (maxBy size . filtJust . map parse . inits) . tails {-"~~."-}
 \end{code}
-That is, for each suffix returned by |tails|, we attempt to compute the longest prefix of balanced parentheses (as in |maxBy size . filtJust . map parse . inits|).
+That is, for each suffix returned by |tails|, we attempt to compute the longest \emph{prefix} of balanced parentheses (as in |maxBy size . filtJust . map parse . inits|).
 
 The next step is usually to apply the ``scan lemma'':
 \begin{lemma}
@@ -97,35 +97,37 @@ Since |inits| is a |foldr| --- |inits = foldr (\x xss -> [] : map (x:) xss) [[]]
 % \begin{spec}
 %   inits = foldr (\x xss -> [] : map (x:) xss) [[]] {-"~~,"-}
 % \end{spec}
-a reasonable attempt is to use the fold-fusion theorem to fuse |maxBy size . filtJust . map parse| into |inits|, to form a single |foldr|:
-\begin{theorem}[|foldr|-fusion]
-\label{thm:foldr-fusion}
-  |h . foldr f e = foldr g (h e)| if |h (f x y) = g x (h y)|.
-\end{theorem}
-Trying to satsify the condition for fusing |map parse| and |inits|:
-%if False
-\begin{code}
--- fuseCond0 :: String -> Tree
-fuseCond0 :: Char -> [String] -> [Maybe Tree]
-fuseCond0 x xss =
-\end{code}
-%endif
-\begin{code}
-      map parse ([] : map (x:) xss)
- ===    {- since |parse [] = Just Null| -}
-      Just Null : map (parse . (x:)) xss
- ===    {- wish, for some |g'| -}
-      Just Null : g' x (map parse xss) {-"~~,"-}
-\end{code}
-%if False
-\begin{code}
-  where g' :: Char -> [Maybe Tree] -> [Maybe Tree]
-        g' = undefined
-\end{code}
-%endif
-we wish |map (parse . (x:)) = g' x . map parse| for some |g'|.
-For that, we need |parse (x : xs) = g'' x (parse xs)| for some |g''|,
-that is, |parse| shall be a |foldr| too. Is that possible?
+a reasonable attempt is to use the fold-fusion theorem to fuse |maxBy size . filtJust . map parse| into |inits|, to form a single |foldr|.
+% \begin{theorem}[|foldr|-fusion]
+% \label{thm:foldr-fusion}
+%   |h . foldr f e = foldr g (h e)| if |h (f x y) = g x (h y)|.
+% \end{theorem}
+% Trying to satsify the condition for fusing |map parse| and |inits|:
+% %if False
+% \begin{code}
+% -- fuseCond0 :: String -> Tree
+% fuseCond0 :: Char -> [String] -> [Maybe Tree]
+% fuseCond0 x xss =
+% \end{code}
+% %endif
+% \begin{code}
+%       map parse ([] : map (x:) xss)
+%  ===    {- since |parse [] = Just Null| -}
+%       Just Null : map (parse . (x:)) xss
+%  ===    {- wish, for some |g'| -}
+%       Just Null : g' x (map parse xss) {-"~~,"-}
+% \end{code}
+% %if False
+% \begin{code}
+%   where g' :: Char -> [Maybe Tree] -> [Maybe Tree]
+%         g' = undefined
+% \end{code}
+% %endif
+% we wish |map (parse . (x:)) = g' x . map parse| for some |g'|.
+% For that, we need |parse (x : xs) = g'' x (parse xs)| for some |g''|,
+% that is, |parse| shall be a |foldr| too. Is that possible?
+Trying to fuse |map parse| into |inits|, it will soon turn out that we will need |parse . (x:) = g x . parse| for some |g|, that is, |parse| shall be a |foldr| too.
+Is that possible?
 
 Since |parse| is defined in terms of |inv pr|,
 it would be helpful if there is a method to construct the inverse of a function as a fold --- as presented in the next section.

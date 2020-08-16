@@ -25,9 +25,9 @@ initDer1 =
 \begin{code}
       maxBy size . map (maxBy size . filtJust . map parse . inits) . tails
  ===    {- Section~\ref{sec:foldify} -}
-      maxBy size . map (fst . foldr bstep (Null,[])) . tails
- ===  fst . maxBy (size . fst) . map (foldr bstep (Null,[])) . tails
- ===    {- Lemma~\ref{lma:scan-lemma} -}
+      maxBy size . map (fst . build) . tails
+ ===  fst . maxBy (size . fst) . map build . tails
+ ===    {- Lemma~\ref{lma:scan-lemma}, |build = foldr bstep (Null,[])| -}
       fst . maxBy (size . fst) . scanr bstep (Null,[]) {-"~~."-}
 \end{code}
 We have therefore derived:

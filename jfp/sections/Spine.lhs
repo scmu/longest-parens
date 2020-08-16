@@ -47,7 +47,7 @@ When it is represented this way, a newly added subtree becomes the sibling of |F
 How do we print a spine tree?
 Observe that the tree in Figure~\ref{fig:spine01} shall be printed as
 |"(((t)u)v)w"|
-(where {\tt t} and {\tt u}, etc in typewriter font denote |pr t| and |pr u|).
+(where {\tt t} and {\tt u}, etc. in typewriter font denote |pr t| and |pr u|, etc.).
 %|"(((" ++ pr t ++ ")" ++ pr u ++ ")" ++ pr v ++ ")" ++ pr w|.
 For general cases, we claim that for all |ts :: Spine| we have
 %the following lemma is true:
@@ -69,7 +69,7 @@ propPrRoll t ts =
 \end{equation}
 where |replicate n x| returns a list containing |n| copies of |x|.
 %\end{lemma}%
-Proof of \eqref{eq:pr-roll} is a routine induction on the length of |ts|.
+Proof of \eqref{eq:pr-roll} is a routine induction on |ts|.
 
 Let |prS (t,ts)| be |pr (roll (t,ts))| without the leading left parentheses:
 \begin{code}
@@ -79,9 +79,9 @@ prS (t,ts) = pr t ++ foldr (\u xs -> ")" ++ pr u ++ xs) "" ts{-"~~."-}
 When a spine tree contains merely a singleton tree, |prS (t,[])| equals |pr t|, which is a string of balanced parentheses.
 A spine tree |(t,[u,v])| is printed as |"t)u)v"|,
 having two unmatched right parentheses, because we anticipate more trees to be added from the lefthand side.
-While |inv pr| cannot be a |foldr|, we can construct |inv prS| as a fold.
+While |inv pr| cannot be a |foldr|, the function |inv prS| could be.
 
-We now try to construct an inductive definition of |prS| that does not use |(++)| and does not rely on |pr|.
+Before using Theorem~\ref{thm:conv-fun}, we construct an inductive definition of |prS| that does not use |(++)| and does not rely on |pr|.
 For a base case, |prS (Null,[]) = ""|.
 When the spine contains more than one tree, we calculate:
 %if False
@@ -170,7 +170,7 @@ where |stepM| is monadified |step| --- the case |(t,[])| missing in |step| is ex
 
 To relate |parseS| to |parse|, notice that |prS (t,[]) = pr t|.
 We therefore have |parse = unwrapM <=< parseS|,
-where where |(<=<) :: (b -> M c) -> (a -> M b) -> (a -> M c)| is Kleisli composition, and |unwrapM (t,[]) = Just t|, otherwise |unwrapM| returns |Nothing|.
+where |(<=<) :: (b -> M c) -> (a -> M b) -> (a -> M c)| is (reversed) Kleisli composition, and |unwrapM (t,[]) = Just t|, otherwise |unwrapM| returns |Nothing|.
 
 %if False
 \begin{code}

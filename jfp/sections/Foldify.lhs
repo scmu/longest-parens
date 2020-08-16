@@ -76,9 +76,29 @@ bstep '(' (t,[])    = (Null,[])
 bstep '(' (t,u:ts)  = (Fork t u, ts) {-"~~."-}
 \end{code}
 %endif
-For example,
-|parseS "))(" = Nothing|, while |build "))(" = (Null,[Null,Null])| ---
+For example, while |parseS "))(" = Nothing|,
+we have |build "))(" = (Null,[Null,Null])| ---
 the same result |build| and |parseS| would return for |"))"|.
+
+\begin{figure}[t]
+{\small
+\begin{center}
+\begin{tabular}{lll}
+|inits|    & |parseS|           & |build| \\
+\hline
+|""|       & |J (N,[])|           & |(N,[])| \\
+|"("|      & |Nothing|            & |(N,[])| \\
+|"()"|     & |J (F N N,[])|       & |(F N N,[])| \\
+|"())"|    & |J (F N N,[N])|      & |(F N N,[N])| \\
+|"())("|   & |Nothing|            & |(F N N,[N])| \\
+|"())()"|  & |J (F N N,[F N N])|  & |(F N N,[F N N])|\\
+|"())()("| & |Nothing|            & |(F N N,[F N N])|
+\end{tabular}
+\end{center}
+}%\small
+\caption{Results of |parseS| and |build| for each prefix of |"())()("|.}
+\label{fig:parseSvsBuild}
+\end{figure}
 
 We claim that the optimal prefix can be computed by |build|:
 \begin{equation}
@@ -107,25 +127,6 @@ Figure~\ref{fig:parseSvsBuild} shows the results of |parseS| and |build| for eac
 We can see that there are three prefixes for which |parseS| returns |Nothing|, while |build| yields a spine.
 All of these spines, however, are what |parseS| would return for some other prefix anyway.
 % Using |fst . largest| instead of |maxBy (size . unwrap)| is safe too: if |(F N N,[F N N])| is chosen by lexicographic ordering, the spine |(F N N, [])| must be a result of some prefix, and either way the optimal tree is |F N N|.
-\begin{figure}[t]
-{\small
-\begin{center}
-\begin{tabular}{lll}
-|inits|    & |parseS|           & |build| \\
-\hline
-|""|       & |J (N,[])|           & |(N,[])| \\
-|"("|      & |Nothing|            & |(N,[])| \\
-|"()"|     & |J (F N N,[])|       & |(F N N,[])| \\
-|"())"|    & |J (F N N,[N])|      & |(F N N,[N])| \\
-|"())("|   & |Nothing|            & |(F N N,[N])| \\
-|"())()"|  & |J (F N N,[F N N])|  & |(F N N,[F N N])|\\
-|"())()("| & |Nothing|            & |(F N N,[F N N])|
-\end{tabular}
-\end{center}
-}%\small
-\caption{Results of |parseS| and |build| for each prefix of |"())()("|.}
-\label{fig:parseSvsBuild}
-\end{figure}
 
 Formally proving \eqref{eq:largest-build-intro}, however, is a tricky task.
 It turns out that we need to prove a non-trivial generalisation of \eqref{eq:largest-build-intro}, recorded in Appendix~\ref{sec:largest-build-gen}.
@@ -141,7 +142,10 @@ We generalise the process to picking a maximum using the ordering |unlhd|, defin
 That is, |(t,ts) `unlhd` (u,us)| if |size t <= size u|, |ts| is no longer than
 |us|, and for every tree |t'| in |ts|, we have |size t' <= size u'| where |u'| is the tree in |us| in corresponding position.
 The ``smallest'' spine under |unlhd| is |(Null,[])|.
-While |unlhd| is not a total ordering, |bstep| is monotonic with respect to |unlhd|: for all |v, w :: Spine| and |x `elem` {'(',')'}|, we have
+In our context where we choose an optimal spine built from prefixes of the same list,
+it is safe using |unlhd| because if a spine |(t,ts)| is the largest under |unlhd|, the spine |(t,[])| must be in the set of spines too and is optimal under the original order.
+
+Furthermore, while |unlhd| is not a total ordering, |bstep| is monotonic with respect to |unlhd|: for all |v, w :: Spine| and |x = '('| or |')'|, we have
 |v `unlhd` w  ==> bstep x v `unlhd` bstep x w|.
 That means the list of spines returned by |map build . inits| is sorted in ascending order, with the largest spine in the end:
 \begin{spec}
