@@ -48,7 +48,7 @@ ml = undefined
 choose = foldr ml (Null,[])
 \end{code}
 %endif
-where |pickJust :: Maybe Spine -> Spine| extracts the spine if the input is wrapped by |Just|, otherwise returns |Nothing|.
+where |pickJust :: Maybe Spine -> Spine| extracts the spine if the input is wrapped by |Just|, otherwise returns |(Null,[])|.
 
 Let |bsteps [y0,y1..yn] = bstep y0 . bstep y1 ... bstep yn|,
 and |stepsM [y0,y1..yn] = stepM y0 <=< stepM y1 ... <=< stepM yn|.
