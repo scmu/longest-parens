@@ -42,7 +42,7 @@ lbp = fst . maxBy (size . fst) . scanr bstep (Null,[]) {-"~~."-}
           bstep '(' (t, u:ts)  = (Fork t u, ts) {-"~~."-}
 \end{code}
 %endif
-To avoid recomputing the sizes each time, we can annotate each tree by its size: letting |Spine = ((Tree, Int), [(Tree, Int)])|, resulting in the an algorithm that runs in linear-time:
+To avoid recomputing the sizes each time, we can annotate each tree by its size: letting |Spine = ((Tree, Int), [(Tree, Int)])|, resulting in an algorithm that runs in linear-time:
 %{
 %format lbp' = lbp
 \begin{code}
@@ -65,4 +65,4 @@ lbpl = fst . maxBy fst . scanr step (0,[]) {-"~~,"-}
 
 \paragraph*{Acknowledgements}~
 The problem was suggested by Yijia Chen.
-The authors would like to thank our colleagues in IIS, Academia Sinica, in particular Hsiang-Shang `Josh' Ko, for valuable discussions.
+The authors would like to thank our colleagues in IIS, Academia Sinica, in particular Hsiang-Shang `Josh' Ko and Liang-Ting Chen, for valuable discussions.

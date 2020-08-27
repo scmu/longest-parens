@@ -142,7 +142,7 @@ For some intuition how the tree construction works,
 a right parenthesis |')'| indicates starting a new tree, thus we shift |t| to the right and start freshly with |Null|;
 a left parenthesis |'('| ought to be the leftmost symbol of some |"(t)u"|,
 thus we wrap the two most recent siblings into one tree.
-When there are no such two siblings (that is, |inv prS xs = (t,[])|), the construction fails.
+When there are no such two siblings (that is, |inv prS xs = (t,[])|), the construction fails --- |inv prS| is a partial function.
 % In other words, we have derived:
 % %{
 % %format invprS = "{" prS "}^{\hstretch{0.5}{-}1}"
@@ -155,6 +155,8 @@ When there are no such two siblings (that is, |inv prS xs = (t,[])|), the constr
 % We have that |prS (invprS ts) = ts| for all |ts| in the domain of |invprS|.
 % %}
 
+We could proceed to work with |inv prS| for the rest of this pearl but,
+for clarity, we prefer to observe partiality explicitly.
 Let |parseS| be the monadified version of |inv prS|, given by:
 \begin{code}
 parseS :: String -> Maybe Spine

@@ -163,7 +163,8 @@ In summary, we have
   fst . max_unlhd . map build . inits
 =  {- discussion above -}
   fst . last . map build . inits
-= fst . build {-"~~."-}
+=  {- free theorem of |last| and |last . inits = id| -}
+  fst . build {-"~~."-}
 \end{spec}
 
 % Now we are ready to fuse |largest . map build| into |inits| by Theorem~\ref{thm:foldr-fusion}.
