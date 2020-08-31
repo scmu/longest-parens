@@ -78,7 +78,7 @@ prS (t,ts) = pr t ++ foldr (\u xs -> ")" ++ pr u ++ xs) "" ts{-"~~."-}
 \end{code}
 When a spine tree contains merely a singleton tree, |prS (t,[])| equals |pr t|, which is a string of balanced parentheses.
 A spine tree |(t,[u,v])| is printed as |"t)u)v"|,
-having two unmatched right parentheses, because we anticipate more trees to be added from the lefthand side.
+with two unmatched right parentheses, because we anticipate more trees to be added from the lefthand side.
 While |inv pr| cannot be a |foldr|, the function |inv prS| could be.
 
 Before using Theorem~\ref{thm:conv-fun}, we construct an inductive definition of |prS| that does not use |(++)| and does not rely on |pr|.
@@ -166,7 +166,7 @@ parseS (x:xs)  = parseS xs >>= stepM x {-"~~,"-}
          stepM '(' (t, [])      = Nothing
          stepM '(' (t, u : ts)  = Just (Fork t u, ts) {-"~~,"-}
 \end{code}
-where |stepM| is monadified |step| --- the case |(t,[])| missing in |step| is extended to returning |Nothing|.
+where |stepM| is monadified |step| --- the case |(t,[])| missing in |step| is extended to return |Nothing|.
 % Note that another way to write the inductive case is
 % |parseS (x:xs) = (stepM x <=< parseS) xs|, where |(<=<) :: (b -> M c) -> (a -> M b) -> (a -> M c)| is Kleisli composition, an operator we will use later.
 
