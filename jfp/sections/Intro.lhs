@@ -52,6 +52,7 @@ We will construct |parse| more formally in Section~\ref{sec:spine}.
 % It may appear that it defeats the purpose if we assume that we can determine whether a input is in the domain of |inv pr|, but we will present a more precise definition later.
 
 The result of |map parse| is passed to |filtJust :: [Maybe a] -> [a]|, which chooses only those elements wrapped by |Just|.
+%\footnote{|filtJust| is called |catMaybe| in the standard library.}
 For this problem |filtJust| always returns a non-empty list, because the empty string can always be parsed to |Just Null|.
 Given |f :: a -> b| where |b| is a type that is ordered, |maxBy f :: [a] -> a| picks a maximum element from the input.
 %Finally, |size t| computes the length of |pr t|.

@@ -16,6 +16,9 @@
 \usepackage{xcolor}
 \usepackage{subcaption}
 \usepackage{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[utf8x]{inputenc}
 
 \usepackage{doubleequals}
 

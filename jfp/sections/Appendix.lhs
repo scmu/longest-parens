@@ -22,7 +22,7 @@ We notice two properties:
 \item if |parseS xs| is |Nothing|, |build xs = build xs'| for some proper
    prefix |xs'| of |xs|.
 \end{enumerate}
-Let |oplus :: Spine -> Spine -> Spine| be any binary operator that is associative, commutative, and idempotent, with identity |(Null,[])|, and let |choose = foldr oplus (Null,[])|.
+Let |oplus :: Spine -> Spine -> Spine| be any binary operator that is associative, commutative, and idempotent, with identity |[Null]|, and let |choose = foldr oplus [Null]|.
 The two properties above imply that for all |ys| and |x|:
 \begin{equation}
 \begin{split}
@@ -40,15 +40,15 @@ buildInitsShadow ys x =
 
 pickJust :: Maybe Spine -> Spine
 pickJust (Just t) = t
-pickJust Nothing = (Null, [])
+pickJust Nothing = [Null]
 
 ml :: Spine -> Spine -> Spine
 ml = undefined
 
-choose = foldr ml (Null,[])
+choose = foldr ml [Null]
 \end{code}
 %endif
-where |pickJust :: Maybe Spine -> Spine| extracts the spine if the input is wrapped by |Just|, otherwise returns |(Null,[])|.
+where |pickJust :: Maybe Spine -> Spine| extracts the spine if the input is wrapped by |Just|, otherwise returns |[Null]|.
 
 Let |bsteps [y0,y1..yn] = bstep y0 . bstep y1 ... bstep yn|,
 and |stepsM [y0,y1..yn] = stepM y0 <=< stepM y1 ... <=< stepM yn|.
@@ -66,9 +66,9 @@ The generalisation we can prove is:
 \begin{code}
 largestBuildGen :: String -> String -> Tree
 largestBuildGen ys xs =
-  fst ((largest . map build . inits) ys `bl`
+  head ((largest . map build . inits) ys `bl`
         (maxBy (size . unwrap) . filtJust . map (stepsM ys <=< parseS) . initsP) xs) ===
-  fst ((largest . map build . inits) ys `bl` (largest . map (bsteps ys . build) . initsP) xs)
+  head ((largest . map build . inits) ys `bl` (largest . map (bsteps ys . build) . initsP) xs)
 \end{code}
 %endif
 where |initsP| returns \emph{non-empty} prefixes of the input list.

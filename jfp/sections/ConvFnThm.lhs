@@ -1,12 +1,13 @@
 \section{Converse-of-a-Function Theorem}
 
-The converse-of-a-function theorem \citep{BirddeMoor:97:Algebra, deMoorGibbons:00:Pointwise} gives us conditions under which the \emph{relational converse} --- a generalised notion of inverse --- of a function can be written as a \emph{relational} fold of any initial datatype defined as a least fixed-point of a base functor.
-For this paper we need only a simplified version that covers functional folds on lists:
+Given a function |f :: b -> t|, the converse-of-a-function theorem \citep{BirddeMoor:97:Algebra, deMoorGibbons:00:Pointwise} constructs the relational converse --- a generalised notion of inverse --- of |f|.
+The converse is given as a relational fold whose input type is |t|, which can be any inductively-defined datatype with a polynomial base functor.
+We specialize the general theorem for our needs: we use it to construct only functions, not relations, and only when |t| is a list.
 %{
 %format finv = "\Varid{f}^{-1}"
 \begin{theorem}
 \label{thm:conv-fun}
-Given |f :: b -> [a]|, if we have |base :: a| and |step :: a -> b -> b| satisfying:
+Given |f :: b -> [a]|, if we have |base :: b| and |step :: a -> b -> b| satisfying:
 \begin{align*}
 |f base| &= |[]| \quad\wedge \\
 |f (step x t)| &= |x : f t| \mbox{~~,}
@@ -25,11 +26,13 @@ then |inv f = foldr step base xs| is a partial right inverse of |f|. That is, we
 
 % \todo{A simpler example, or trim some parts of this section off if they are not necessary.}
 
-While the relational, generic version of the theorem was not trivial to prove,
+While the relational, data-generic version of the theorem was not trivial to prove,
 proof of the functional version above is a simple induction on the input list.
 
 To find the right inverse of |pr| using Theorem~\ref{thm:conv-fun}, we have to find |step :: Char -> Tree -> Tree| such that
 |pr (step x t) = x : pr t|, where |x| is either |'('| or |')'|.
 One can see that there is no way this equality could hold: |pr| always returns strings containing balanced parentheses,
-but the strings returned by the two calls to |pr| in the equation cannot be both balanced.
-This is a hint that we should generalise the problem to consider trees that are partially built, which would be printed to strings of parentheses that are not necessarily balanced.
+but for all |u| such that |pr u = x : pr t|, it is not possible that both |pr u| and |pr t| are balanced.
+
+This is a hint that we should instead consider a generalisation of |pr| whose input are not necessarily completed trees (that prints to balanced parentheses).
+For |pr (step x t) = x : pr t| to hold, |t| should represent some partially built trees that can still be extended from the left, while |step x t| extends |t| such that its printout is preceded by an additional |x|.
