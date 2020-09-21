@@ -12,7 +12,7 @@ import Utilities
 \end{code}
 %endif
 
-\section{Wrapping Up}
+\section{Wrapping Up and Conclusions}
 \label{sec:wrap}
 
 We can finally resume the main derivation in Section~\ref{sec:intro}:
@@ -63,7 +63,12 @@ lbpl = head . maxBy head . scanr step [0] {-"~~,"-}
           step '(' (m:n:ts) = 2+m+n : ts {-"~~."-}
 \end{code}
 
+So we have derived a solution to the problem.
+We find it an interesting journey because it involves two techniques:
+the usual approach for solving segment problems, and the converse-of-a-function theorem --- through which we derived an instance of shift-reduce parsing.
+We hope the reader enjoyed this journey too.
+
 \paragraph*{Acknowledgements}~
-The problem was suggested by Yijia Chen.
+The problem was suggested by Yi-Chia Chen.
 The authors would like to thank our colleagues in IIS, Academia Sinica, in particular Hsiang-Shang `Josh' Ko, Liang-Ting Chen, and Ting-Yan Lai, for valuable discussions.
-Also thanks to Chung-Chieh Shan and Kim-Ee Yeoh for their advices on earlier draft of this paper.
+Also thanks to Chung-Chieh Shan and Kim-Ee Yeoh for their advices on earlier drafts of this paper.

@@ -143,7 +143,7 @@ prSi ('(':xs)  = case prSi xs of (t : u : ts)  -> Fork t u : ts {-"~~,"-}
 \end{code}
 which is pleasingly symmetrical to |prS|.
 
-For an intuition explanation,
+For an operational explanation,
 a right parenthesis |')'| indicates starting a new tree, thus we start freshly with a |Null|;
 a left parenthesis |'('| ought to be the leftmost symbol of some |"(t)u"|,
 thus we wrap the two most recent siblings into one tree.

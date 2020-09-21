@@ -16,7 +16,7 @@ For example, for input |"))(()())())()("| the output should be |"(()())()"|.
 We also consider a reduced version of the problem in which we return only the length of the segment.
 \footnote{The length-only version was possibly used as an interview problem, collected in, for example, \url{https://leetcode.com/problems/longest-valid-parentheses/}.}
 
-For an initial specification, balanced parentheses can be captured by a number of grammars that are equivalent, for example |S -> epsilon || (S) || SS|, or |S -> epsilon || (S)S|. We choose the latter because it is both concise and unambiguous. Its parse tree can be represented in Haskell as below,
+For a specification, balanced parentheses can be captured by a number of grammars that are equivalent, for example |S -> epsilon || (S) || SS|, or |S -> epsilon || (S)S|. We choose the latter because it is both concise and unambiguous. Its parse tree can be represented in Haskell as below,
 with a function |pr| specifying how a tree is printed:
 \begin{code}
 data Tree = Null | Fork Tree Tree {-"~~,"-}
@@ -52,7 +52,7 @@ We will construct |parse| more formally in Section~\ref{sec:spine}.
 % It may appear that it defeats the purpose if we assume that we can determine whether a input is in the domain of |inv pr|, but we will present a more precise definition later.
 
 The result of |map parse| is passed to |filtJust :: [Maybe a] -> [a]|, which chooses only those elements wrapped by |Just|.
-%\footnote{|filtJust| is called |catMaybe| in the standard library.}
+\footnote{|filtJust| is called |catMaybe| in the standard library.}
 For this problem |filtJust| always returns a non-empty list, because the empty string can always be parsed to |Just Null|.
 Given |f :: a -> b| where |b| is a type that is ordered, |maxBy f :: [a] -> a| picks a maximum element from the input.
 %Finally, |size t| computes the length of |pr t|.
@@ -93,7 +93,7 @@ scanr oplus e (x:xs)  = let (y:ys) = scanr oplus e xs in (x `oplus` y) : y : ys 
 \end{lemma}
 If we can turn |maxBy size . filtJust . map parse . inits| into a |foldr|,
 %the algorithm can proceed in a |scanr|.
-and if |oplus| is a constant-time operation, we get a linear-time algorithm.
+where |oplus| is a constant-time operation, we get a linear-time algorithm.
 Since |inits| is a |foldr| --- |inits = foldr (\x xss -> [] : map (x:) xss) [[]]|,
 % \begin{spec}
 %   inits = foldr (\x xss -> [] : map (x:) xss) [[]] {-"~~,"-}
