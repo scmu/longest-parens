@@ -26,3 +26,7 @@ arxiv/LongParens.tex
 *.out
 
 arxiv/LongParens.pdf
+
+icfp/LongParensICFP.tex
+
+icfp/LongParensICFP.pdf
