@@ -1,0 +1,196 @@
+
+Denote prS^-1 by prSi. To make it clearer, I've decided to
+represent partiality by a Maybe monad. Thus prSi can be
+represnted by:
+
+  prSi :: String -> Maybe Spine
+  prSi "" = J (N,[])
+  prSi (x:xs) = prSi xs >>= stepM x
+
+  stepM ')' (t,ts)   = Just (N, t:ts)
+  stepM '(' (t,[])   = Nothing
+  stepM '(' (t,u,ts) = Just (F t u, ts)
+
+Meanwhile, define
+
+  build :: String -> Spine
+  build "" = (N,[])
+  build (x:xs) = step x (build xs)    -- build is a foldr
+
+  step ')' (t,ts)   = (N, t:ts)
+  step '(' (t,[])   = (N,[])
+  step '(' (t,u,ts) = (F t u, ts)
+
+prSi and build disagree on some inputs. For example,
+
+  prSi "())(" = Nothing,
+  build "())(" = build "())" = (F N N,[N])
+
+However, we have that
+
+ 1. prSi xs is either Nothing, or Just (build xs).
+ 2. if prSi xs is Nothing, build xs = build xs' for some proper
+    prefix xs' of xs.
+
+---
+
+Also define
+
+ largest :: [Spine] -> Spine
+ largestM :: [Maybe Spine] -> Spine
+
+largestM can return a Spine, because (for our problem)
+at least one element in the list will be Just (N,[]).
+
+Denote the binary case of largest by `l`. That is,
+largest (x:xs) = x `l` largest xs. We also overload it
+for the monadic function largestM.
+
+Property 1 and 2 means that
+
+   (largest . map build . inits $ ys) 'l' prSi (ys++[x])
+ = (largest . map build . inits $ ys) 'l' build (ys++[x])  -- (3)
+
+The reason is that either
+ * prSi (ys++[x]) is Just (build (ys+[x])), or
+ * prSi (ys++[x]) is Nothing, in this case build (ys++[x])
+   is in map build . inits $ ys.
+
+---
+
+Define
+
+ steps [] = id
+ steps (x:xs) = step x . steps xs
+
+ stepsM [] = return
+ stepsM (x:xs) = stepM x <=< stepsM xs
+
+That is, steps [x0,x1..xn] = step x0 . step x1 ... step xn,
+and stepsM [x0,x1..xn] = stepM x0 <=> step x1 ... <=< stepM xn.
+
+---
+We want to prove:
+
+ largestM . map prS . inits $ xs =
+   largest . map build . inits $ xs
+
+For that we need to prove a generalized lemma:
+
+Lemma:
+
+  (largest . map build . inits $ ys) 'l'
+    (largestM . map (stepsM ys <=< prSi) . inits+ $ xs) =
+  (largest . map build . inits $ ys) 'l'
+    (largest . map (steps ys . build) . inits+ $ xs)
+
+where inits+ denotes all non-empty prefixes.
+
+When ys := [], the lemma reduces to (3).
+
+Proof.
+
+Induction on xs. The case when xs := [] is immediate.
+For xs := x:xs :
+
+  (largest . map build . inits $ ys) 'l'
+    (largestM . map (stepsM ys <=< prSi) . inits+ $ (x:xs))
+= (largest . map build . inits $ ys) 'l'
+    (largestM . map (stepsM ys <=< prSi) $ ([x] : map (x:) (inits+ xs)))
+= (largest . map build . inits $ ys) 'l'
+    prSi (ys++[x]) `l`
+    (largestM . map ((stepsM ys <=< prSi) . (x:)) . inits+ $ xs)
+=    { (3) }
+  (largest . map build . inits $ ys) 'l'
+    build (ys++[x]) `l`
+    (largestM . map (stepsM (ys++[x]) <=< prSi) . inits+ $ xs)
+= (largest . map build . inits $ (ys++[x])) 'l'
+    (largestM . map (stepsM (ys++[x]) <=< prSi) . inits+ $ xs)
+=    { induction }
+  (largest . map build . inits $ (ys++[x])) 'l'
+    (largest . map (steps (ys++[x]) . build) . inits+ $ xs)
+= (largest . map build . inits $ ys) 'l'
+    build (ys ++ [x]) `l`
+    (largest . map (steps (ys++[x]) . build) . inits+ $ xs)
+= (largest . map build . inits $ ys) 'l'
+    (largest . map (steps ys . build) . inits+ $ (x:xs))
+
+--- foldr fusion
+
+So let us try fusing
+  largest . map build . inits
+into one foldr.
+
+The fusion condition:
+
+   largest . map build $ ([] : map (x:) xss)
+ = (N,[]) `l` largest . map (build . (x:)) $ xss
+ =   {- -}
+   (N,[]) `l` largest . map (step x) . map build $ xss
+ =   {- -}
+   (N,[]) `l` step x . largest . map build $ xss
+
+
+
+ --
+ [((N,[]),""),
+  ((N,[]),"(")]
+
+ [((N,[]),""),
+  ((N,[N]),")"),
+  ((N,[N]),")(")]
+
+
+
+[((N,[]),""),
+ ((N,[]),"("), --
+ ((F N N,[]),"()"),
+ ((F N N,[]),"()("), --
+ ((F N (F N N),[]),"()()")]
+
+
+[((N,[]),""),
+ ((N,[]),"("),
+ ((F N N,[]),"()"),
+ ((F N N,[N]),"())"),
+ ((F N N,[N]),"())("),
+ ((F N N,[F N N]),"())()")]
+
+[((N,[]),""),
+ ((N,[]),"("),       --
+ ((F N N,[]),"()"),
+ ((F N N,[N]),"())"),
+ ((F N N,[N]),"())("),  --
+ ((F N N,[N]),"())(("), --
+ ((F N N,[N]),"())(()"), --
+ ((F N N,[F (F N N) N]),"())(())")]
+
+--
+[((N,[]),""),
+ ((N,[]),"("),
+ ((N,[]),"(("),
+ ((N,[]),"(()"),
+ ((F (F N N) N,[]),"(())")]
+
+ [((N,[]),""),
+  ((N,[]),"("),
+  ((F N N,[]),"()"),
+  ((F N N,[]),"()("),
+  ((F N N,[]),"()(("),
+  ((F N N,[]),"()(()"),
+  ((F N (F (F N N) N),[]),"()(())"),
+  ((F N (F (F N N) N),[]),"()(())(")]
+
+[(Just (N,[]),""),
+ (Nothing,"("),
+ (Just (F N N,[]),"()"),
+ (Just (F N N,[N]),"())"),
+ (Just (F N N,[N,N]),"()))"),
+ (Nothing,"()))(")]
+
+ [((N,[]),""),
+  ((N,[]),"("),
+  ((F N N,[]),"()"),
+  ((F N N,[N]),"())"),
+  ((F N N,[N,N]),"()))"),
+  ((F N N,[N,N]),"()))(")]

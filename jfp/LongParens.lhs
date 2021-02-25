@@ -1,6 +1,5 @@
 \RequirePackage{amsmath}
 \documentclass{jfp}
-
 % build using
 %    lhs2TeX LongParens.lhs | pdflatex --jobname=LongParens
 
@@ -18,7 +17,7 @@
 \usepackage{graphicx}
 \usepackage[T1]{fontenc}
 \usepackage{textcomp}
-\usepackage[utf8x]{inputenc}
+%\usepackage[utf8x]{inputenc}
 
 \usepackage{doubleequals}
 
@@ -77,7 +76,8 @@ an Exercise in Program Inversion in a Segment Problem}
 
 %% Bibliography
 \bibliographystyle{JFPlike}
-\bibliography{LongParens}
+%\bibliography{LongParens}
+\input{LongParens.bbl}
 
 \appendix
 \renewcommand{\thesection}{\Alph{section}}

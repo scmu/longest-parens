@@ -1,0 +1,388 @@
+\newcommand{\comment}[2]{{\small#1} (\textit{#2})~}
+\newcommand{\cq}[1]{$\lceil$#1$\rceil$}
+\newcommand{\eplace}[2]{eplace \cq{#1} by: \cq{#2}.}
+\newcommand{\preplace}[3]{#1 r\eplace{#2}{#3}}
+\newcommand{\replace}[2]{R\eplace{#1}{#2}}
+\newcommand{\add}[1]{Add: \cq{#1}.}
+
+\comment{15--16}{language}
+The title and the remainder use the terminology of segments being \cq{balanced}, but only the abstract and this sentence use \cq{properly bracketed}. For both occurrences: \preplace{just}{
+properly bracketed
+}{
+balanced
+}
+
+\comment{21}{clarity}
+Most readers will be familiar with the concept of LL(1) grammars. Consider replacing \cq{unambiguous} by \cq{LL(1) and therefore ambiguous}.
+
+\comment{27}{clarity}
+An example will help the reader check their understanding of these definitions.
+\add{
+For example, the string \texttt{"(()())()"} is represented by the tree \texttt{Fork (Fork Null (Fork Null Null)) (Fork Null Null)}, and indeed, this is the result of applying function $pr$ to this tree.
+}
+
+\comment{28}{clarity}
+The components $maxBy~size$ and $segments$ in the following specification of function $lbp$ hold no surprise: the first speaks for itself, and the second should be well known. The role of $filtJust$, in contrast, can only be understood in combination with the meaning of $parse$, specifically how its partiality is represented through ``monadification''. It would therefore seem better to move the explanation of function $parse$ up, from lines 35--40 to before line 28. Because $parse$ is best explained as an implementation of $pr^{{-}1}$, it is better to discuss this inverse first. This requires some reshuffling and further adjustments of the text, for which I suggest:
+\begin{quote}Function $pr$ is injective but not surjective: it does not yield unbalanced strings. Therefore its right inverse, that is, the function $pr^{{-}1}$ such that $pr(pr^{{-}1}\;xs)=xs$, is partial; its domain is the set of balanced parenthesis strings. We implement it by a function that is made total by using the $\mathsf{Maybe}$ monad. This function $parse :: \mathtt{String} \to \mathtt{Maybe~Tree}$ builds a parse tree -- $parse~xs$ should return $\mathtt{Just}~t$ such that $pr~t =~xs$ if $xs$ is balanced, and return $\mathtt{Nothing}$ otherwise. We will construct parse more formally in Section 3.\end{quote}
+\preplace{Then}{
+thus
+}{
+then
+}
+
+\comment{47}{language}
+\replace{
+chooses only those elements
+}{
+collects the elements (of type $a$)
+}
+
+\comment{54}{clarity}
+\add{
+Here and in the following, ``optimal'' means: balanced, and of maximal length.
+}
+
+\comment{74}{language}
+\replace{
+turn $maxBysize \cdot filtJust \cdot map~parse \cdot inits$ into a $foldr$
+}{
+express $maxBysize \cdot filtJust \cdot map~parse \cdot inits$ in the form $foldr~(\oplus)~e$
+}
+
+\comment{75}{language}
+\replace{
+Since $inits$ is a $foldr$ ---
+}{
+Since $inits$ can be expressed as a right fold, given by
+}
+
+\comment{77--78}{language}
+\replace{fuse ... into ...}{fuse ... with ...}
+
+\comment{79}{language}
+\replace{
+$parse$ shall be a $foldr$
+}{
+$parse$ needs to be a right fold
+}
+
+\comment{80}{language}
+\replace{
+Since $parse$ is defined in terms of $pr^{{-}1}$, it would be helpful
+}{
+Since $parse$ implements $pr^{{-}1}$, it will be helpful
+}
+
+\comment{91}{typo; language}
+\replace{
+$filtJust$ is called $catMaybe$ in the standard library
+}{
+$filtJust$ is called $catMaybes$ in the basic Haskell libraries
+}
+(Note the plural form $Maybe\underline{s}$.)
+
+\comment{104}{language}
+\replace{
+for our needs
+}{
+to our needs
+}
+
+\comment{105}{language}
+\replace{
+when $t$ is a list
+}{
+for the case where $t$ is a list type
+}
+
+\comment{107--112}{clarity}
+Why use the names $base$ and $step$ instead of $e$ and $(\oplus)$? The latter will make this and the following developent more readable. (For $bstep$ in function $build$, then use e.g. $(\otimes)$.)
+
+\comment{111}{error}
+\replace{
+$foldr~step~base~xs$
+}{
+$foldr~step~base$
+}
+
+\comment{112}{error}
+\replace{
+\textit{for all $xs$ in the domain of $f^{{-}1}$}
+}{
+\textit{for all $xs$ in the range of $f$}
+}
+
+\comment{121}{typo}
+\replace{
+input are
+}{
+inputs are
+}
+
+\comment{122}{language}
+\replace{
+that print
+}{
+trees that print
+}
+
+\comment{123}{clarity}
+\replace{
+$t$ should represent some partially built trees that can still be extended from the left
+}{
+$t$ should also be able to represent partially built trees that can still become balanced by being extended to the left
+}
+
+\comment{124}{clarity}
+The clause \cq{, while $step~x~t$ ... additional $xs$} can be left out; it has no function but merely repeats a clear and concise equation in a more clumsy and verbose way.
+
+\comment{130}{language}
+\replace{
+extended from left
+}{
+extended to the left
+}
+
+\comment{130}{clarity}
+\replace{
+$\texttt{"(()(()t)u)v"}$
+}{
+$\texttt{"(()(()t)u)v"}$, where $\texttt{t}$, $\texttt{u}$ and $\texttt{v}$ stand for segments of balanced parentheses
+}
+
+\comment{130}{clarity}
+\replace{
+the three trees $t$, $u$, and $v$ under the dotted line
+}{
+the three trees $t$, $u$, and $v$ under the dotted line,>>
+where $pr(t) = \texttt{"t"}$,
+$pr(u) = \texttt{"u"}$,
+and $pr(v) = \texttt{"v"}$}
+
+\comment{131--135, 190--194, 206, 227}{language}
+In an exposition of this kind, where the audience is taken on a guided tour, the pronoun \cq{we} generally stands for \cq{the author(s), together with their audience}. Here, however, it suddenly stands for something entirely different: the process executing a program under development, as if the authors and their audience have turned into computing machinery. While this abuse of language is usual in a lecture, it should be avoided in writing. It is also potentially ambiguous, for example in the question \cq{How do we print a spine?} (line 149), where it asks how to code the printing process, but could be read as asking how printing code will be executed.
+\newline
+\replace{
+we have / we should / we read / we start / ...
+}{
+the process has / the process should / the process reads / the process starts / ...
+}
+Of course, creative variations are possible and desirable, such as using the passive voice (\cq{when only
+		$\texttt{")t)u)v"}$
+		has been read})
+or being more specific \cq{the parsing process starts}.
+
+\comment{136}{clarity}
+\replace{
+list of trees
+}{
+list of (fully built) trees
+}
+(We now also have partially built trees.)
+
+	\comment{160}{clarity}
+	\replace{
+an inductive definition of $prS$ that does
+}{
+a new definition for $prS$, one that is inductive and does
+}
+
+\comment{165}{clarity}
+\replace{
+definitions of $pr$ and $prS$
+}{
+definition of $pr$, original definition of $prS$
+}
+
+\comment{167}{clarity}
+\replace{
+definition of $prS$
+}{
+original definition of $prS$
+}
+
+\comment{170}{clarity}
+\replace{
+following definition of $prS$
+}{
+following new definition of $prS$
+}
+
+\comment{189, 191}{punctuation}
+\replace{
+, thus
+}{
+; thus,
+}
+
+\comment{193}{language}
+\replace{
+Some readers might have noticed
+}{
+Readers may have noticed
+}
+(Or, just \cq{Notice}.)
+
+\comment{207}{language}
+\replace{
+notice
+}{
+recall
+}
+
+\comment{209}{punctuation}
+\replace{
+, otherwise
+}{
+; otherwise,
+}
+
+\comment{224}{typo}
+\replace{
+$unwarp$
+}{
+$unwrap$
+}
+
+\comment{227}{clarity}
+In this case, the parentheses around the consed expression actually make this less readable.
+\replace{
+({'}\texttt{(}'$s\: : xs$)
+}{
+{'}\texttt{(}'$ {:}\,xs$
+}
+
+\comment{227}{clarity}
+\replace{
+when the recursive call returns $[t]$
+}{
+if the recursive call has returned a singleton list $[t]$
+}
+
+\comment{229}{punctuation}
+\replace{
+while if
+}{
+while, if
+}
+
+\comment{251}{error}
+\replace{
+$build$ and $parseS$
+}{
+$build$
+}
+Note that the functions have different result types and cannot return the same result.
+
+\comment{251--252}{clarity}
+\replace{
+$parseS$ is a partial function 
+}{
+$parseS$ implements a partial function
+}
+
+\comment{252--253}{clarity}
+\replace{
+$build$ is a total function that parses a prefix of the string.
+}{
+$build$ is a total function that parses the maximal prefix of the string that can still become balanced by being extended to the left.
+}
+
+\comment{254--282}{proof structure}
+Let $\mathit{opref}\:xs$ denote the optimal prefix of $xs$. The following three related propositions hold.
+\\\hspace*{1em}(1)~~~
+If $parseS~xs = \mathsf{Just}~s$, then $build~xs =s$.
+\\\hspace*{1em}(2)~~~
+$parseS~xs = \mathsf{Just}\;[t]$ iff $pr~t = xs$.
+\\\hspace*{1em}(3)~~~
+$head\;(build~xs) = t$ iff $pr~t = \mathit{opref}\:xs$.
+\\
+A weaker version is found in the first paragraph :w of the appendix. It seems that (4.1) almost follows from these propositions, and I wonder if they may be helpful stepping stones in proving your (4.1).
+
+\comment{266}{error}
+\replace{
+the same as $\mathsf{Null}$
+}{
+the same as $[\mathsf{Null}]$
+}
+
+\comment{266 \textit{ff.}}{rabbit}
+Nothing prepares the reader for the magical appearance of $(\unlhd)$. Was it hidden in the top hat, or lowered from the ceiling like a \emph{deus ex machina}? It seems to me that its invention is driven by the need to have an ordering on spines that is compatible (when applicable) with the original one, and has a monotonicity property allowing the selection to be replaced by $last$. These needs basically force the definition of $(\unlhd)$, in view of such equalities as $size~(\mathtt{Fork}~t~u) = 2 + size~t + size~u$.
+
+Is the detour via $(\unlhd)$ really necessary? It may be better to observe that the last element of the list of builds always has the most sizeable head of the bunch, and then develop the machinery needed to prove this. It is possible to define a partial order on trees respecting their print sizes, where $\mathsf{Null}$ is at the bottom, and a fork dominates another fork when each of its children dominates the corresponding other child. Then the result of applying $map~head~\cdot~map~build~\cdot~inits$ is sorted. There are nice properties relating $build~(xs +\!\!\!\!+ [x])$ to $build~xs$, which can be proved by induction on $xs$: either $build~(xs +\!\!\!\!+ [x])$ extends $build~xs$ by snoccing a $\mathsf{Null}$, or $build~(xs +\!\!\!\!+ [x])$ has the same length, but, if not equal to $build~xs$, differs in precisely one element, which is larger in the tree order. This should suffice to establish the most-sizeable head property. Perhaps the proposition ``$head~(build~(xs +\!\!\!\!+ [x]))$ dominates $head~(build~xs)$'' can also be proved relatively easy by induction. Note: I have not checked in any detail whether this hopefully shorter path is actually feasible (and, if it is, whether it is actually simpler).
+
+\comment{267}{clarity, terminology}
+\replace{
+ordering
+}{
+partial order
+}
+
+\comment{268--269}{clarity}
+The functional programmer is likely to read this as a definition by cases, which, however fails.
+Consider $(map~build~\cdot~inits)~\texttt{")"}$, which equals $[build~\texttt{""}, build~\texttt{")"}] = [\,[\mathsf{Null}], [\mathsf{Null},\mathsf{Null}]\,]$. The use of $max_{\unlhd}$ requires comparing $[\mathsf{Null},\mathsf{Null}]$ with $[\mathsf{Null}]$. Well,
+\\\hspace*{2.75em}
+$[\mathsf{Null},\mathsf{Null}] ~\unlhd~ [\mathsf{Null}]$
+\\\hspace*{1em}
+$\equiv~~\mathsf{Null} : [\mathsf{Null}] ~\unlhd~ \mathsf{Null} : [\;]$
+\\\hspace*{1em}
+$\equiv~~[\mathsf{Null}] ~\unlhd~ [\;]$
+\\\hspace*{1em}
+$\equiv~~\mathrm{???}$
+\\
+Neither of the two clauses applies. (The problem does not occur if all comparisons are between a pair with on the left an earlier element of $(map~build~\cdot~inits)~xs$ than on the right, but this is not made explicit -- and there is, nevertheless, a proof obligation that the situation cannot occur; that $max_{\unlhd}$ will never see $[\ldots, [\mathsf{Null},\mathsf{Null}], [\mathsf{Null}], \ldots]$.) The falsehood of $[\mathsf{Null},\mathsf{Null}] ~\unlhd~ [\mathsf{Null}]$ is implied by the antisymmetry of partial orders, but for the sake of clarity it is better to add a clause that covers the case.
+Replace
+\\\hspace*{3em}
+$[\;] ~\unlhd~ us~~\wedge $
+\\by:
+\\\hspace*{3em}
+$[\;] ~\unlhd~ us~~\equiv~~\mathsf{true}$
+\\\hspace*{1em}
+$(t : ts) ~\unlhd~ [\;]\,~~\equiv~~\mathsf{false}$
+\\.
+
+\comment{273--275}{handwaving}
+This skips a few steps. Why ``must'' $[t]$ be in the set of spines too? How does this follow, precisely, from $t : ts$ being maximal (not ``largest'') under $({\unlhd})$? 
+
+\comment{277}{error}
+\replace{
+$bstep$ is monotonic
+}{
+$bstep~x$ is monotonic
+}
+
+\comment{302}{proof presentation}
+Include a hint here (\cq{= \{free theorem\}}?) why the step is valid.
+
+\comment{339}{convention}
+\replace{
+LNCS, no.\ 1816
+}{
+LNCS 1816
+}
+This is the conventional way of referring to volumes in the LNCS series. At the very least, replace \cq{no.} by \cq{vol.}.
+
+\comment{341}{convention}
+\replace{
+\textit{(Special Issue for Mathematics of Program Construction)}
+}{
+(Special Issue: Mathematics of Program Construction (MPC 2002))
+}
+
+\comment{362}{typography}
+\replace{
+$xs{=}$
+}{
+$xs~~=$
+}
+
+\comment{366}{equality}
+There is no reason to use ``$:=$'' here; this is not an assignment, definition or substitution.
+\replace{
+$:=$
+}{
+$=$
+}
+
+\comment{372}{proof presentation}
+You should include a validity hint here, referring to a separate proposition that presents the (not entirely trivial) relationship between $(stepsM~ys <\!\!\!=\!\!\!<parseS)~x$ and $parseS~(ys+\!\!\!\!+[ x ])$.
