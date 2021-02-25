@@ -20,3 +20,9 @@ jfp/LongParens.pdf
 *.aux
 
 *.agdai
+
+arxiv/LongParens.tex
+
+*.out
+
+arxiv/LongParens.pdf
