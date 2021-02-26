@@ -65,6 +65,9 @@ We find it an interesting problem because it involves two techniques: the usual 
 \maketitle
 
 %include sections/Intro.lhs
+%include sections/ConvFnThm.lhs
+%include sections/Spine.lhs
+%include sections/Foldify.lhs
 
 
 \bibliographystyle{ACM-Reference-Format}

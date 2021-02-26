@@ -59,7 +59,7 @@ The function |segments :: [a] -> [[a]]| returns all segments of a list, with |in
 % It returns |Nothing| for inputs not in the domain of |inv pr|.
 % It may appear that it defeats the purpose if we assume that we can determine whether a input is in the domain of |inv pr|, but we will present a more precise definition later.
 The result of |map parse| is passed to |filtJust :: [Maybe a] -> [a]|, which collects only those elements wrapped by |Just|.
-\footnote{|filtJust| is called |catMaybes| in the standard library.}
+\footnote{|filtJust| is called |catMaybes| in the standard Haskell libraries.}
 For this problem |filtJust| always returns a non-empty list, because the empty string, which is a member of |segments xs| for any |xs|, can always be parsed to |Just Null|.
 Given |f :: a -> b| where |b| is a type that is ordered, |maxBy f :: [a] -> a| picks a maximum element from the input.
 Finally, |size t| computes the length of |pr t|.
@@ -67,7 +67,8 @@ Finally, |size t| computes the length of |pr t|.
 
 The length-only problem can be specified by |lbsl = size . lbs|.
 
-\paragraph{An initial derivation}
+\section{An Initial Derivation}
+
 It is known that many \emph{optimal segment} problems (those whose goal is to compute a segment of a list that is optimal up to certain criteria) can be solved by following a fixed pattern
 \cite{Bird:87:Introduction, Gibbons:97:Calculating}.
 In the first step, finding an optimal segment is factored into finding, for each suffix, an optimal prefix.
@@ -97,11 +98,13 @@ which says that if a function |f| can be expressed as right fold,
 there is a more efficient algorithm to compute |map f . inits|:
 \begin{lemma}
 \label{lma:scan-lemma}
+{\rm
 |map (foldr oplus e) . tails = scanr oplus e|, where
 \begin{spec}
 scanr oplus e []      = [e]
 scanr oplus e (x:xs)  = let (y:ys) = scanr oplus e xs in (x `oplus` y) : y : ys {-"~~."-}
 \end{spec}
+} %rm
 \end{lemma}
 If |lbp| can be written in the form |foldr oplus e|, we do not need to compute |lbp| of each suffix from scratch;
 each optimal prefix can be computed, in |scanr|, from the previous optimal prefix by |oplus|.
@@ -114,10 +117,19 @@ Since |inits| can be expressed as a right fold  --- |inits = foldr (\x xss -> []
 %   inits = foldr (\x xss -> [] : map (x:) xss) [[]] {-"~~,"-}
 % \end{spec}
 a reasonable attempt is to use the fold-fusion theorem to fuse |maxBy size . filtJust . map parse| with |inits|, to form a single |foldr|.
-% \begin{theorem}[|foldr|-fusion]
-% \label{thm:foldr-fusion}
-%   |h . foldr f e = foldr g (h e)| if |h (f x y) = g x (h y)|.
-% \end{theorem}
+Recall the |foldr|-fusion theorem:
+\begin{theorem}[|foldr|-fusion]
+\label{thm:foldr-fusion}
+{\rm
+  |h . foldr f e = foldr g (h e)| if |h (f x y) = g x (h y)|.
+} %rm
+\end{theorem}
+To fuse |map parse| and |inits|, we need to have
+|map parse ([] : map (x:) xss) = Just Null : g' x (map parse xss)|
+for some |g'|.
+For that, we need |parse (x : xs) = g'' x (parse xs)| for some |g''|,
+that is, |parse| needs to be a right fold too.
+Is that possible?
 % Trying to satsify the condition for fusing |map parse| and |inits|:
 % %if False
 % \begin{code}
@@ -139,11 +151,6 @@ a reasonable attempt is to use the fold-fusion theorem to fuse |maxBy size . fil
 %         g' = undefined
 % \end{code}
 % %endif
-% we wish |map (parse . (x:)) = g' x . map parse| for some |g'|.
-% For that, we need |parse (x : xs) = g'' x (parse xs)| for some |g''|,
-% that is, |parse| shall be a |foldr| too. Is that possible?
-Trying to fuse |map parse| into |inits|, it will soon turn out that we will need |parse . (x:) = g x . parse| for some |g|, that is, |parse| needs to be a right fold too.
-Is that possible?
 
 Since |parse| implements |inv pr|,
 it would be helpful if there is a method to construct the inverse of a function as a fold --- as presented in the next section.
