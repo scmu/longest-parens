@@ -37,7 +37,8 @@
 \begin{document}
 
 \title[Longest Segment of Balanced Parentheses]%
-{Longest Segment of Balanced Parentheses\\
+{Longest Segment of Balanced Parentheses:\\
+An Exercise in Program Inversion in a Segment Problem
 {\small Functional Pearl}}
 
 \author{Shin-Cheng Mu}

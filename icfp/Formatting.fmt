@@ -27,7 +27,7 @@
 %format . = "\mathbin{\cdot}"
 %format `app` = "\mathbin{\$}"
 %format app = "(\mathbin{\$})"
-%format ++ = "\mathbin{+\!\!\!\!\!+}"
+%format ++ = "\mathrel{\,+\!\!\!\!\!+\,}"
 
 %format <=> = "\mathrel{\equiv}"
 %format ==> = "\mathrel{\Rightarrow}"

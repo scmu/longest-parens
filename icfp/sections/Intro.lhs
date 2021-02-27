@@ -25,11 +25,11 @@ Other grammars have worked too, however, albeit leading to lengthier algorithms.
 The parse tree of the chosen grammar can be represented in Haskell as below,
 with a function |pr| specifying how a tree is printed:
 \begin{code}
-data Tree = Null | Fork Tree Tree {-"~~,"-}
+data Tree = Nil | Bin Tree Tree {-"~~,"-}
 
 pr :: Tree -> String
-pr Null        = ""
-pr (Fork t u)  = "(" ++ pr t ++ ")" ++ pr u {-"~~."-}
+pr Nil        = ""
+pr (Bin t u)  = "(" ++ pr t ++ ")" ++ pr u {-"~~."-}
 \end{code}
 %if False
 \begin{code}
@@ -38,15 +38,17 @@ deriving instance Read Tree
 deriving instance Eq   Tree
 \end{code}
 %endif
-For example, applying |pr| to the |Fork (Fork Null (Fork Null Null)) (Fork Null Null)| yields the string |"(()())()"|.
+For example, |pr (Bin Nil Nil) = "()"|,
+|pr (Bin Nil (Bin Nil Nil)) = "()()"|,
+and applying |pr| to |(Bin (Bin Nil (Bin Nil Nil)) (Bin Nil Nil))| yields |"(()())()"|.
 
 Function |pr| is injective but not surjective: it does not yield un-balanced strings.
 Therefore its right inverse, that is, the function |inv pr| such that |pr (inv pr xs) = xs|, is partial;
 its domain is the set of balanced parenthesis strings.
 We implement it by a function that is made total by using the |Maybe| monad.
-This function |parse :: String -> Maybe Tree| builds a parse tree  --- |parse xs| should return |Just t| such that |pr t = xs| if |xs| is balanced, and return |Nothing| otherwise. We will construct parse more formally in Section~\ref{sec:spine}.
+This function |parse :: String -> Maybe Tree| builds a parse tree  --- |parse xs| should return |Just t| such that |pr t = xs| if |xs| is balanced, and return |Nothing| otherwise. We will construct |parse| more formally in Section~\ref{sec:spine}.
 
-The problem can then be specified by (|lbs| standing for ``longest balanced segment (of parentheses)''):
+The problem can then be specified as below, where |lbs| stands for ``longest balanced segment (of parentheses)'':
 \begin{code}
 lbs :: String -> Tree
 lbs = maxBy size . filtJust . map parse . segments {-"~~,"-}
@@ -59,8 +61,8 @@ The function |segments :: [a] -> [[a]]| returns all segments of a list, with |in
 % It returns |Nothing| for inputs not in the domain of |inv pr|.
 % It may appear that it defeats the purpose if we assume that we can determine whether a input is in the domain of |inv pr|, but we will present a more precise definition later.
 The result of |map parse| is passed to |filtJust :: [Maybe a] -> [a]|, which collects only those elements wrapped by |Just|.
-\footnote{|filtJust| is called |catMaybes| in the standard Haskell libraries.}
-For this problem |filtJust| always returns a non-empty list, because the empty string, which is a member of |segments xs| for any |xs|, can always be parsed to |Just Null|.
+\footnote{|filtJust| is called |catMaybes| in the standard Haskell libraries. The authors think the name |filtJust| is more informative.}
+For this problem |filtJust| always returns a non-empty list, because the empty string, which is a member of |segments xs| for any |xs|, can always be parsed to |Just Nil|.
 Given |f :: a -> b| where |b| is a type that is ordered, |maxBy f :: [a] -> a| picks a maximum element from the input.
 Finally, |size t| computes the length of |pr t|.
 % Specification of the ``length only'' problem is simply |size . lbp|.
@@ -116,7 +118,7 @@ Since |inits| can be expressed as a right fold  --- |inits = foldr (\x xss -> []
 % \begin{spec}
 %   inits = foldr (\x xss -> [] : map (x:) xss) [[]] {-"~~,"-}
 % \end{spec}
-a reasonable attempt is to use the fold-fusion theorem to fuse |maxBy size . filtJust . map parse| with |inits|, to form a single |foldr|.
+a reasonable attempt is to fuse |maxBy size . filtJust . map parse| with |inits|, to form a single |foldr|.
 Recall the |foldr|-fusion theorem:
 \begin{theorem}[|foldr|-fusion]
 \label{thm:foldr-fusion}
@@ -124,10 +126,12 @@ Recall the |foldr|-fusion theorem:
   |h . foldr f e = foldr g (h e)| if |h (f x y) = g x (h y)|.
 } %rm
 \end{theorem}
-To fuse |map parse| and |inits|, we need to have
-|map parse ([] : map (x:) xss) = Just Null : g' x (map parse xss)|
-for some |g'|.
-For that, we need |parse (x : xs) = g'' x (parse xs)| for some |g''|,
+To fuse |map parse| and |inits| using Theorem~\ref{thm:foldr-fusion}, we need to have, for some |g'|,
+\begin{spec}
+ map parse ([] : map (x:) xss) = Just Nil : g' x (map parse xss) {-"~~."-}
+\end{spec}
+For that to hold, we need
+|parse (x : xs) = g'' x (parse xs)| for some |g''|,
 that is, |parse| needs to be a right fold too.
 Is that possible?
 % Trying to satsify the condition for fusing |map parse| and |inits|:
@@ -140,10 +144,10 @@ Is that possible?
 % %endif
 % \begin{code}
 %       map parse ([] : map (x:) xss)
-%  ===    {- since |parse [] = Just Null| -}
-%       Just Null : map (parse . (x:)) xss
+%  ===    {- since |parse [] = Just Nil| -}
+%       Just Nil : map (parse . (x:)) xss
 %  ===    {- wish, for some |g'| -}
-%       Just Null : g' x (map parse xss) {-"~~,"-}
+%       Just Nil : g' x (map parse xss) {-"~~,"-}
 % \end{code}
 % %if False
 % \begin{code}
@@ -164,12 +168,12 @@ it would be helpful if there is a method to construct the inverse of a function 
 % When given such an input, we do not want the entire computation to fail.
 % Partial computations are typically modeled in Haskell by |Maybe| monad.
 % For this problem, however, we use a light-weight approach.
-% We let |parse| return |Null|, which prints to |""|, indeed the longest segment of |"((("| that can be parsed to a tree.
+% We let |parse| return |Nil|, which prints to |""|, indeed the longest segment of |"((("| that can be parsed to a tree.
 % Define the following ``totalising'' operator:
 % \begin{spec}
 % total :: (a -> Tree) -> a -> Tree
 % total f x  = f x   {-"\quad\mbox{, } x \in \Varid{dom}~\Varid{f} "-}
-%            = Null  {-"\quad\mbox{, otherwise.}"-}
+%            = Nil  {-"\quad\mbox{, otherwise.}"-}
 % \end{spec}
 % We let |parse = total (inv pr)|.
 
