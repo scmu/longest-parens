@@ -11,13 +11,13 @@ import Utilities
 \end{code}
 %endif
 
-\section{Optimal Prefix in a Fold}
+\section{Longest Balanced Prefix in a Fold}
 \label{sec:foldify}
 
-Recall our objective: to turn
-|maxBy size . filtJust . map parse . inits| into a |foldr|.
+Recall our objective: to compute
+|lbp = maxBy size . filtJust . map parse . inits| in a right fold.
 % posssibly by |foldr|-fusion.
-We calculate:
+Now that we have |parse = unwrapM <=< parseF| where |parseF| is a right fold, we calculate:
 %if False
 \begin{code}
 optPreDer0 :: String -> Tree
@@ -35,38 +35,88 @@ optPreDer0 =
 \begin{code}
 unwrap :: Spine -> Tree
 unwrap [t] = t
-unwrap _   = Null
+unwrap _   = Nil
 \end{code}
 %endif
 The last step is a routine calculation whose purpose is to factor the postprocessing |unwrapM| out of the main computation.
 We introduce |unwrap :: [Tree] -> Tree|, defined by |unwrap [t] = t| and for all other input it returns |Null|, the smallest tree.
 
-% For reason to be clear later, however, we need two generalisations.
-% Firstly, we compare spine trees by \emph{lexicographic ordering}, that is
-% |(t,ts)| and |(u,us)| are compared first by comparing sizes of |t| and |u|.
-% If |size t = size u|, we then compare the first trees in |ts| and |us|, and so on.
-% An empty list is considered smaller than a non-empty list.
-% We denote the binary operator that chooses a lexicographically larger spine by |bl :: Spine -> Spine -> Spine|, and define |largest = foldr bl (Null,[])|.
+Recall that |inits = foldr (\x xss -> [] : map (x:) xss) [[]]|.
+The aim now is to fuse |map parseF|, |filtJust|, and |maxBy (size . unwrap)| with |inits|.
+By Theorem~\ref{thm:foldr-fusion}, to fuse |map parseF| with |inits|, we need to construct some |step| such that
+|map parseF ([] : map (x:) xss) = step x (map parseF xss)|.
+We calculate:
+%if False
+\begin{code}
+fuseCondMapParseFInit :: Char -> [String] -> [Maybe [Tree]]
+fuseCondMapParseFInit x xss =
+\end{code}
+%endif
+\begin{code}
+      map parseF ([] : map (x:) xss)
+ ===  Just [Nil] : map (parseF . (x:)) xss
+ ===   {- the |foldr| definition of |parseF| -}
+      Just [Nil] : map (\ts -> parseF ts >>= stepM x) xss
+ ===  Just [Nil] : map (>>= stepM x) (map parseF xss) {-"~~."-}
+\end{code}
+Therefore we have
+%{
+%format mapParseFInits = map "~" parseF . inits
+\begin{code}
+mapParseFInits :: String -> [Maybe [Tree]]
+mapParseFInits =
+   foldr (\x tss -> Just [Nil] : map (>>= stepM x) tss) [Just [Nil]] {-"~~."-}
+\end{code}
+%}
+Next, we fuse |filtJust| with |map parseF . inits| by Theorem~\ref{thm:foldr-fusion}.
+After some calculations, we get:
+%{
+%format filtJustMapParseFInits = filtJust . map "~" parseF . inits
+\begin{code}
+filtJustMapParseFInits :: String -> [[Tree]]
+filtJustMapParseFInits = foldr (\x tss -> [Nil] : extend x tss) [[Nil]] {-"~~,"-}
+    where  extend ')' tts = map (Nil :) tts
+           extend '(' tts = [(Bin t u : ts) | (t : u : ts) <- tts] {-"~~."-}
+\end{code}
+%}
+The program still maintains a collection of |[Tree]|, but all the |Nothing| entries are filtered away.
+If the next character is |')'|, we append |Nil| to every list of trees.
+If the next entry is |'('|, we choose those lists having at least two trees, and combine them ---
+the list comprehension keeps only those elements that matches the pattern |(t : u : ts)| and throws away those do not.
+In both cases we add |[Nil]|, which the empty string is parsed to, to the collection.
 
-To compute the optimal spine tree in a |foldr|, we need two more generalisations.
-Firstly, recall the definition of |parseF|.
-In the |'(':xs| case, if the recursive call has returned a singleton list |[t]|, we abort the computation by returning |Nothing|.
-This means that the information computed so far is disposed of,
-while, if we wish to process all prefixes in a single |foldr|, it helps to maintain some accumulated results.
-The following non-monadic function |build| returns |[Null]| in this case, allowing the computation to carry on:
-% \begin{spec}
-% build :: String -> Spine
-% build ""        = (Null,[])
-% build (')':xs)  = case build xs of  (t,ts)      -> (Null, t:ts)
-% build ('(':xs)  = case build xs of  (t,[])      -> (Null,[])
-%                                     (t, u: ts)  -> (Fork t u, ts) {-"~~,"-}
-% \end{spec}
+\begin{figure}[t]
+{\small
+\begin{center}
+\begin{tabular}{lll}
+|inits|    & |map parseF|         & |filtJust| \\
+\hline
+|""|       & |J [N]|              & |[N]| \\
+|"("|      & |Nothing|            &  \\
+|"()"|     & |J [B N N]|          & |[B N N]| \\
+|"())"|    & |J [B N N,N]|        & |[B N N,N]| \\
+|"())("|   & |Nothing|            &  \\
+|"())()"|  & |J [B N N,F N N]|    & |[B N N,B N N]|\\
+|"())()("| & |Nothing|            &
+\end{tabular}
+\end{center}
+}%\small
+\caption{Results of |parseF| and |filtJust| for prefixes of |"())()("|.}
+\label{fig:FiltParseFExample}
+\end{figure}
+
+To think about how to deal with |unwrap . maxBy (size . unwrap)|, we consider an example.
+Figure~\ref{fig:FiltParseFExample} shows the results of |map parseF| and |filtJust| for prefixes of |"())()("|,
+where |Just|, |Nil|, and |Bin| are respectively abbreviated to |J|, |N|, and |B|.
+The function |maxBy (size . unwrap)| chooses between |[N]| and |[B N N]|, the two complete parses, and returns |[B N N]|. However, notice that |B N N| is also the head of |[B N N,B N N]|, the head of the last result returned by |filtJust|. In general, the head of the last list returned will be the largest parse tree. That is, |unwrap . maxBy (size . unwrap)| can be replaced by |head . last|.
+
+
 \begin{code}
 build :: String -> [Tree]
-build = foldr bstep [Null] {-"~~,"-}
-  where  bstep ')' ts        = Null:ts
-         bstep '(' [t]       = [Null]
-         bstep '(' (t:u:ts)  = Fork t u : ts {-"~~."-}
+build = foldr bstep [Nil] {-"~~,"-}
+  where  bstep ')' ts        = Nil : ts
+         bstep '(' [t]       = [Nil]
+         bstep '(' (t:u:ts)  = Bin t u : ts {-"~~."-}
 \end{code}
 %if False
 \begin{code}
@@ -74,116 +124,5 @@ bstep :: Char -> Spine -> Spine
 bstep ')' ts        = Null:ts
 bstep '(' [t]       = [Null]
 bstep '(' (t:u:ts)  = Fork t u : ts {-"~~."-}
-\end{code}
-%endif
-For example, while |parseF "))(" = Nothing|,
-we have |build "))(" = [Null,Null,Null]| ---
-the same result |build| and |parseS| would return for |"))"|.
-In effect, while |parseS| is a partial function that attempts to parse an entire string, |build| is a total function that parses a prefix of the string.
-
-\begin{figure}[t]
-{\small
-\begin{center}
-\begin{tabular}{lll}
-|inits|    & |parseS|           & |build| \\
-\hline
-|""|       & |J [N]|              & |[N]| \\
-|"("|      & |Nothing|            & |[N]| \\
-|"()"|     & |J [F N N]|          & |[F N N]| \\
-|"())"|    & |J [F N N,N]|        & |[F N N,N]| \\
-|"())("|   & |Nothing|            & |[F N N,N]| \\
-|"())()"|  & |J [F N N,F N N]|    & |[F N N,F N N]|\\
-|"())()("| & |Nothing|            & |[F N N,F N N]|
-\end{tabular}
-\end{center}
-}%\small
-\caption{Results of |parseS| and |build| for each prefix of |"())()("|.}
-\label{fig:parseSvsBuild}
-\end{figure}
-
-We claim that the optimal prefix can be computed by |build|:
-\begin{equation}
-\begin{split}
-  & |maxBy (size . unwrap) . filtJust . map parseS . inits|~=\\
-  & \qquad |maxBy (size . unwrap) . map build . inits| \mbox{~~.}
-\end{split}
-\label{eq:largest-build-intro}
-\end{equation}
-%if False
-\begin{code}
-optPreProp0 :: String -> Spine
-optPreProp0 =
-  maxBy (size . unwrap) . filtJust . map parseS . inits ===
-    maxBy (size . unwrap) . map build . inits
-
-largest :: [Spine] -> Spine
-largest = foldr bl [Null]
-
-bl :: Spine -> Spine -> Spine
-bl = undefined
-\end{code}
-%endif
-An informal explanation is that using |build| instead of |parseS| does not generate anything new.
-Figure~\ref{fig:parseSvsBuild} shows the results of |parseS| and |build| for each prefix of |"())()("|,
-where |Just|, |Null|, and |Fork| are respectively abbreviated to |J|, |N|, and |F|.
-We can see that there are three prefixes for which |parseS| returns |Nothing|, while |build| yields a spine.
-All of these spines, however, are what |parseS| would return for some other prefix anyway.
-% Using |fst . largest| instead of |maxBy (size . unwrap)| is safe too: if |(F N N,[F N N])| is chosen by lexicographic ordering, the spine |(F N N, [])| must be a result of some prefix, and either way the optimal tree is |F N N|.
-
-Formally proving \eqref{eq:largest-build-intro}, however, is a tricky task.
-It turns out that we need to prove a non-trivial generalisation of \eqref{eq:largest-build-intro}, recorded in Appendix~\ref{sec:largest-build-gen} for interested readers.
-
-For the second generalisation, note that in |maxBy (size . unwrap)|,
-two singleton spines |[t]| and |[u]| are compared by the sizes of |t| and |u|, while |t:ts| is treated the same as |Null|.
-We generalise the process to picking a maximum using the ordering |unlhd|, defined below:
-% \begin{spec}
-%   []      `unlhd` us  {-"~~"-} &&
-%   (t:ts)  `unlhd` (u:us) {-"~~"-}<=>{-"~~"-} size t <= size u {-"\,"-}&&{-"\,"-} ts `unlhd` us {-"~~."-}
-% \end{spec}
-\begin{align*}
-  |[]| & |`unlhd` us  {-"~~"-} &&| \\
-  |(t:ts)| & |`unlhd` (u:us) {-"~~"-}<=>{-"~~"-} size t <= size u {-"\,"-}&&{-"\,"-} ts `unlhd` us {-"~~."-}|
-\end{align*}
-% \begin{spec}
-%   (t,ts) `unlhd` (u,us) {-"~~"-}<=> {-"~~"-} size t <= size u {-"\,"-}&&{-"\,"-} ts `preceq` us {-"~~,"-}
-%     where  [] `preceq` us  {-"~~"-} &&
-%            (t:ts) `preceq` (u:us) {-"~~"-}<=>{-"~~"-} size t <= size u {-"\,"-}&&{-"\,"-} ts `preceq` us {-"~~."-}
-% \end{spec}
-That is, |ts `unlhd` us| if |ts| is no longer than
-|us|, and for every tree |t| in |ts|, we have |size t <= size u| where |u| is the tree in |us| in corresponding position.
-The ``smallest'' spine under |unlhd| is |[Null]|.
-In our context where we choose an optimal spine built from prefixes of the same list,
-it is safe using |unlhd| because if a spine |t:ts| is the largest under |unlhd|, the spine |[t]| must be in the set of spines too and is optimal under the original order.
-
-Furthermore, while |unlhd| is not a total ordering, |bstep| is monotonic with respect to |unlhd|: for all |vs, ws :: Spine| and |x = '('| or |')'|, we have
-|vs `unlhd` ws  ==> bstep x vs `unlhd` bstep x ws|.
-That means the list of spines returned by |map build . inits| is sorted in ascending order, with the largest spine in the end:
-\begin{equation*}
-   |build [] {-"~"-}`unlhd`{-"~"-} build [x0] {-"~"-}`unlhd`{-"~"-} build [x0,x1]{-"~"-}`unlhd`{-"~"-}... {-"~"-}`unlhd`{-"~"-} build [x0...xn] {-"~~."-}|
-\end{equation*}
-
-In summary, we have
-%{
-%if False
-\begin{code}
-mapParseBuild =
-\end{code}
-%endif
-%format max_unlhd = "\Varid{max}_{\unlhd}"
-\begin{code}
-     unwrap . maxBy (size . unwrap) . filtJust . map parseS . inits
- ===  {- \eqref{eq:largest-build-intro} -}
-     unwrap . maxBy (size . unwrap) . map build . inits
- ===  {- let |max_unlhd| denote choosing maximum by |unlhd| -}
-     head . max_unlhd . map build . inits
- ===  {- discussion above -}
-     head . last . map build . inits
- ===  {- free theorem of |last| and |last . inits = id| -}
-     head . build {-"~~."-}
-\end{code}
-%if False
-\begin{code}
- where max_unlhd :: [Spine] -> Spine
-       max_unlhd = undefined
 \end{code}
 %endif

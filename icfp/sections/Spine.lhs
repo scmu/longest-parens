@@ -91,7 +91,7 @@ that is,
 \begin{code}
 prFi ""        = [Nil]
 prFi (')':xs)  = Nil : prFi xs
-prFi ('(':xs)  = case prFi xs of (t : u : ts)  -> Bin t u : ts {-"~~,"-}
+prFi ('(':xs)  = case prFi xs of (t : u : ts) -> Bin t u : ts {-"~~,"-}
 \end{code}
 which is pleasingly symmetrical to |prF|.
 
