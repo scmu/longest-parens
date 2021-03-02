@@ -9,6 +9,7 @@
 %include Formatting.fmt
 
 \usepackage{scalerel}
+\usepackage{paralist}
 \usepackage{doubleequals}
 
 \setlength{\mathindent}{15pt}
@@ -38,27 +39,28 @@
 
 \title[Longest Segment of Balanced Parentheses]%
 {Longest Segment of Balanced Parentheses:\\
-An Exercise in Program Inversion in a Segment Problem
+An Exercise in Program Inversion in a Segment Problem.
 {\small Functional Pearl}}
 
-\author{Shin-Cheng Mu}
-%\authornote{Both authors contributed equally to this research.}
-%\email{trovato@corporation.com}
-%\orcid{1234-5678-9012}
-\author{Tsung-Ju Chiang}
-%\authornotemark[1]
-%\email{webmaster@marysville-ohio.com}
-\affiliation{%
-\institution{Institute of Information Science, %\\
-Academia Sinica}
-\country{Taiwan}
+\author{Anonymous}
+% \author{Shin-Cheng Mu}
+% %\authornote{Both authors contributed equally to this research.}
+% %\email{trovato@corporation.com}
+% %\orcid{1234-5678-9012}
+% \author{Tsung-Ju Chiang}
+% %\authornotemark[1]
+% %\email{webmaster@marysville-ohio.com}
+% \affiliation{%
+% \institution{Institute of Information Science, %\\
+% Academia Sinica}
+% \country{Taiwan}
 }
 
 %\renewcommand{\shortauthors}{Mu and Chiang}
 
 \begin{abstract}
-Given a string of parentheses, the task is to find a longest consecutive segment that is balanced.
-We find it an interesting problem because it involves two techniques: the usual approach for solving segment problems, and the converse-of-a-function theorem --- through which we derived an instance of shift-reduce parsing.
+Given a string of parentheses, the task is to derive a linear-time algorithm to find the longest consecutive segment that is balanced.
+We find it an interesting problem because it involves two techniques: the usual approach for solving segment problems, and a theorem for constructing the inverse of a function --- through which we derive an instance of shift-reduce parsing.
 \end{abstract}
 
 \keywords{program derivation, segment problems, program inversion, parsing}
@@ -69,6 +71,7 @@ We find it an interesting problem because it involves two techniques: the usual 
 %include sections/ConvFnThm.lhs
 %include sections/Spine.lhs
 %include sections/Foldify.lhs
+%include sections/Wrap.lhs
 
 
 \bibliographystyle{ACM-Reference-Format}

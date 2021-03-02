@@ -16,19 +16,23 @@ For example, for input |"))(()())())()("| the output should be |"(()())()"|.
 We also consider a reduced version of the problem in which we return only the length of the segment.
 While there is no direct application of this problem
 \footnote{However, the length-only version was possibly used as an interview problem collected in, for example, \url{https://leetcode.com/problems/longest-valid-parentheses/}.},
-the authors find it interesting because it involves two techniques:
-the usual approach for solving segment problems, and program inversion --- through which we will discover an instance of shift-reduce parsing.
+the authors find it interesting because it involves two techniques.
+Firstly, derivation for such \emph{optimal segment} problems (those whose goal is to compute a segment of a list that is optimal up to certain criteria) usually follows a certain pattern (e.g. \cite{Bird:87:Introduction, Gibbons:97:Calculating}). We would like to see how well that works for this case. Secondly, at one point we will need to construct the right inverse of a function. It will turn out that we will discover an instance of shift-reduce parsing.
 
-\paragraph{Specification} Balanced parentheses can be captured by a number of grammars, for example |S -> epsilon || (S) || SS|, or |S -> epsilon || (S)S|.
-After trying some of them, the authors settled down on |S -> epsilon || (S)S| because it is unambiguous and the most concise.
+\paragraph{Specification} Balanced parentheses can be captured by a number of grammars, for example |S -> epsilon || (S) || SS|, or |S -> {-"\Conid{T}^{*}"-}| and |T -> (S)|.
+After trying some of them, the authors decided on
+\begin{spec}
+S -> epsilon | (S)S {-"~~,"-}
+\end{spec}
+because it is unambiguous and the most concise.
 Other grammars have worked too, however, albeit leading to lengthier algorithms.
 The parse tree of the chosen grammar can be represented in Haskell as below,
 with a function |pr| specifying how a tree is printed:
 \begin{code}
-data Tree = Nil | Bin Tree Tree {-"~~,"-}
+data Tree = Nul | Bin Tree Tree {-"~~,"-}
 
 pr :: Tree -> String
-pr Nil        = ""
+pr Nul        = ""
 pr (Bin t u)  = "(" ++ pr t ++ ")" ++ pr u {-"~~."-}
 \end{code}
 %if False
@@ -38,9 +42,15 @@ deriving instance Read Tree
 deriving instance Eq   Tree
 \end{code}
 %endif
-For example, |pr (Bin Nil Nil) = "()"|,
-|pr (Bin Nil (Bin Nil Nil)) = "()()"|,
-and applying |pr| to |(Bin (Bin Nil (Bin Nil Nil)) (Bin Nil Nil))| yields |"(()())()"|.
+%{
+%format t1
+%format t2
+For example, let |t1 = Bin Nul Nul| and |t2 = Bin Nul (Bin Nul Nul)|,
+we have
+|pr t1 = "()"|,
+|pr t2 = "()()"|,
+and |pr (Bin t2 t1) = "(()())()"|.
+%}
 
 Function |pr| is injective but not surjective: it does not yield un-balanced strings.
 Therefore its right inverse, that is, the function |inv pr| such that |pr (inv pr xs) = xs|, is partial;
@@ -57,21 +67,22 @@ segments = concat . map inits . tails {-"~~,"-}
 filtJust ts = [t | Just t <- ts] {-"~~,"-}
 size t = length (pr t) {-"~~."-}
 \end{code}
-The function |segments :: [a] -> [[a]]| returns all segments of a list, with |inits, tails :: [a] -> [[a]]| respectively compute all prefixes and suffixes of their input lists.
+The function |segments :: [a] -> [[a]]| returns all segments of a list, with |inits, tails :: [a] -> [[a]]| respectively computing all prefixes and suffixes of their input lists.
 % It returns |Nothing| for inputs not in the domain of |inv pr|.
 % It may appear that it defeats the purpose if we assume that we can determine whether a input is in the domain of |inv pr|, but we will present a more precise definition later.
 The result of |map parse| is passed to |filtJust :: [Maybe a] -> [a]|, which collects only those elements wrapped by |Just|.
 \footnote{|filtJust| is called |catMaybes| in the standard Haskell libraries. The authors think the name |filtJust| is more informative.}
-For this problem |filtJust| always returns a non-empty list, because the empty string, which is a member of |segments xs| for any |xs|, can always be parsed to |Just Nil|.
+For this problem |filtJust| always returns a non-empty list, because the empty string, which is a member of |segments xs| for any |xs|, can always be parsed to |Just Nul|.
 Given |f :: a -> b| where |b| is a type that is ordered, |maxBy f :: [a] -> a| picks a maximum element from the input.
 Finally, |size t| computes the length of |pr t|.
 % Specification of the ``length only'' problem is simply |size . lbp|.
 
 The length-only problem can be specified by |lbsl = size . lbs|.
 
-\section{An Initial Derivation}
+\section{The Prefix-Suffix Decomposition}
+\label{sec:inits-tails}
 
-It is known that many \emph{optimal segment} problems (those whose goal is to compute a segment of a list that is optimal up to certain criteria) can be solved by following a fixed pattern
+It is known that many optimal segment problems can be solved by following a fixed pattern
 \cite{Bird:87:Introduction, Gibbons:97:Calculating}.
 In the first step, finding an optimal segment is factored into finding, for each suffix, an optimal prefix.
 For our problem, the calculation goes:
@@ -95,7 +106,7 @@ initDer0 =
 For each suffix returned by |tails|, the program above computes its longest \emph{prefix} of balanced parentheses by |maxBy size . filtJust . map parse . inits|. We abbreviate the latter to |lbp| (for ``longest balanced prefix'').
 
 Calling |lbp| for each suffix is rather costly.
-The next step is to try to apply the following ``scan lemma'',
+The next step is to try to apply the following \emph{scan lemma},
 which says that if a function |f| can be expressed as right fold,
 there is a more efficient algorithm to compute |map f . inits|:
 \begin{lemma}
@@ -128,7 +139,7 @@ Recall the |foldr|-fusion theorem:
 \end{theorem}
 To fuse |map parse| and |inits| using Theorem~\ref{thm:foldr-fusion}, we need to have, for some |g'|,
 \begin{spec}
- map parse ([] : map (x:) xss) = Just Nil : g' x (map parse xss) {-"~~."-}
+ map parse ([] : map (x:) xss) = Just Nul : g' x (map parse xss) {-"~~."-}
 \end{spec}
 For that to hold, we need
 |parse (x : xs) = g'' x (parse xs)| for some |g''|,
@@ -144,10 +155,10 @@ Is that possible?
 % %endif
 % \begin{code}
 %       map parse ([] : map (x:) xss)
-%  ===    {- since |parse [] = Just Nil| -}
-%       Just Nil : map (parse . (x:)) xss
+%  ===    {- since |parse [] = Just Nul| -}
+%       Just Nul : map (parse . (x:)) xss
 %  ===    {- wish, for some |g'| -}
-%       Just Nil : g' x (map parse xss) {-"~~,"-}
+%       Just Nul : g' x (map parse xss) {-"~~,"-}
 % \end{code}
 % %if False
 % \begin{code}
@@ -168,12 +179,12 @@ it would be helpful if there is a method to construct the inverse of a function 
 % When given such an input, we do not want the entire computation to fail.
 % Partial computations are typically modeled in Haskell by |Maybe| monad.
 % For this problem, however, we use a light-weight approach.
-% We let |parse| return |Nil|, which prints to |""|, indeed the longest segment of |"((("| that can be parsed to a tree.
+% We let |parse| return |Nul|, which prints to |""|, indeed the longest segment of |"((("| that can be parsed to a tree.
 % Define the following ``totalising'' operator:
 % \begin{spec}
 % total :: (a -> Tree) -> a -> Tree
 % total f x  = f x   {-"\quad\mbox{, } x \in \Varid{dom}~\Varid{f} "-}
-%            = Nil  {-"\quad\mbox{, otherwise.}"-}
+%            = Nul  {-"\quad\mbox{, otherwise.}"-}
 % \end{spec}
 % We let |parse = total (inv pr)|.
 
