@@ -143,7 +143,7 @@ parse' = unwrapM <=< parseF {-"~~."-}
 \end{code}
 %}
 where |(<=<) :: (b -> M c) -> (a -> M b) -> (a -> M c)| is (reversed) Kleisli composition, and |unwrapM [t] = Just t|; otherwise |unwrapM| returns |Nothing|.
-That is, |parse| calls |parseF|, but declares success only when the input can be parsed into a single tree.
+That is, |parse| calls |parseF|, and declares success only when the input can be parsed into a single tree.
 
 %if False
 \begin{code}

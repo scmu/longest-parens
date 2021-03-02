@@ -75,5 +75,6 @@ We find it an interesting problem because it involves two techniques: the usual 
 
 
 \bibliographystyle{ACM-Reference-Format}
-\bibliography{LongParensICFP}
+%\bibliography{LongParensICFP}
+\input{LongParensICFP.bbl}
 \end{document}
