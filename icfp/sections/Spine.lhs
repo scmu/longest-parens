@@ -14,12 +14,12 @@ import Control.Monad ((<=<))
 
 A string of parentheses is said to be \emph{left-partially balanced} if it may possibly be balanced by adding zero or more parentheses to the left.
 For example, |xs = "(())()))()"| is left-partially balanced because |"((" ++ xs| is balanced. Note that |"(()(" ++ xs| is also balanced.
-As a counter example, the string |ys = "()(()"| is not left-partially balanced --- due to the unmatched |'('| in the middle of |ys|, there is no |zs| such that |zs++ys| is balanced.
+For a counter example, the string |ys = "()(()"| is not left-partially balanced --- due to the unmatched |'('| in the middle of |ys|, there is no |zs| such that |zs++ys| can be balanced.
 
 While parsing a fully balanced string cannot be expressed as a right fold, it is possible to parse left-partially balanced strings using a right fold.
 In this section we consider what data structure such a string should be parsed to, how to parse it, and present a direct definition of |parse|.
 
-A left-partially balanced string can always be uniquely factored into a sequence of balanced substrings, separated by one or more right parentheses.
+A left-partially balanced string can always be uniquely factored into a sequence of fully balanced substrings, separated by one or more right parentheses.
 For example, |xs| can be factored into two balanced substrings, |"(())()"| and |"()"|, separated by |"))"|.
 One of the possible ways to represent such a string is by a list of trees --- a |Forest|, where the trees are supposed to be separated by a |')'|.
 That is, such a forest can be printed by:
@@ -86,13 +86,13 @@ prF' (Bin t u:ts)  = '(' : prF' (t:u:ts) {-"~~."-}
 
 We are now ready to invert |prF| by Theorem~\ref{thm:conv-fun},
 which amounts to finding |base| and |step| such that |prF base = ""| and |prF (step x ts) = x : prF ts| for |x = '('| or |')'|.
-With the inductive definition of |prF| in mind, we pick |base = [Nul]|, and |step| is given by:
+With the inductive definition of |prF| in mind, we pick |base = [Nul]|, and the following |step| meets the requirement:
 \begin{spec}
 step ')' ts            =  Nul : ts
 step '(' (t : u : ts)  =  Bin t u : ts {-"~~."-}
 \end{spec}
-We have thus constructed |inv prF = foldr step [Nul]|,
-that is,
+We have thus constructed |inv prF = foldr step [Nul]|.
+If we expand the definitions, |inv prF| is given by
 %format prFi = "{\Varid{prF}}^{\hstretch{0.5}{-}1}"
 \begin{code}
 prFi :: String -> Forest
@@ -148,12 +148,12 @@ That is, |parse| calls |parseF|, and declares success only when the input can be
 
 %if False
 \begin{code}
-type Spine = [Tree]
+-- type Spine = [Tree]
 
 unwrapM [t]  = Just t
 unwrapM _    = Nothing
 
-stepM :: Char -> Spine -> Maybe Spine
+stepM :: Char -> Forest -> Maybe Forest
 stepM ')' ts            = Just (Nul : ts)
 stepM '(' [t]           = Nothing
 stepM '(' (t : u : ts)  = Just (Bin t u : ts)

@@ -43,7 +43,7 @@ lbs = maxBy size . map head . scanr step [Nul] {-"~~,"-}
 \end{code}
 %endif
 where |step| is as defined in the end of Section~\ref{sec:foldify}.
-To avoid recomputing the sizes in |maxBy|, we can annotate each tree by its size: letting |Forest = [(Tree, Int)]|, resulting in an algorithm that runs in linear-time:
+To avoid recomputing the sizes in |maxBy size|, we can annotate each tree by its size: letting |Forest = [(Tree, Int)]|, resulting in an algorithm that runs in linear-time:
 %{
 %format lbs' = lbs
 \begin{code}
@@ -76,8 +76,9 @@ In Section~\ref{sec:spine} we generalised from trees to forests.
 It is common when applying the converse-of-a-function theorem.
 It was observed that the trees in a forest are those along the left spine of the final tree, therefore such a generalisation is referred to as switching to a ``spine representation'' \cite{MuBird:03:Theory}.
 
-What we derived in Section~\ref{sec:spine} and \ref{sec:foldify} is a compacted form of shift-reduce parsing, where the forest serves as the stack, and the input is processed right-to-left.
-If we were to process the input left-to-right as is often done in parsing, the corresponding grammar would be |S -> epsilon || S(S)|.
+What we derived in Section~\ref{sec:spine} and \ref{sec:foldify} is a compacted form of shift-reduce parsing, where the input is processed right-to-left.
+The forest serves as the stack, but we do not need to push the parser state to the stack, as is done in shift-reduce parsing.
+If we were to process the input in the more conventional left-to-right order, the corresponding grammar would be |S -> epsilon || S(S)|.
 It is an SLR(1) grammar whose parse table contains 5 states.
 Our program is much simpler.
 A possible reason is that consecutive shifting and reducing are condensed into one step.
@@ -85,9 +86,9 @@ It is likely that parsing SLR(1) grammars can be done in a fold.
 The relationship between LR parsing and the converse-of-a-function theorem awaits further investigation.
 
 \begin{acks}
-% The problem was suggested by Yi-Chia Chen.
-% The authors would like to thank our colleagues in IIS, Academia Sinica, in particular Hsiang-Shang `Josh' Ko, Liang-Ting Chen, and Ting-Yan Lai, for valuable discussions.
-% Also thanks to Chung-Chieh Shan and Kim-Ee Yeoh for their advices on earlier drafts of this paper.
+  % The problem was suggested by Yi-Chia Chen.
+  % The authors would like to thank our colleagues in IIS, Academia Sinica, in particular Hsiang-Shang `Josh' Ko, Liang-Ting Chen, and Ting-Yan Lai, for valuable discussions.
+  % Also thanks to Chung-Chieh Shan and Kim-Ee Yeoh for their advices on earlier drafts of this paper.
 Temporarily hidden for double-blinded review.
 However, the authors would like to thank the reviewers of previous versions of this article, whose detailed and constructive criticisms helped a lot in improving this work.
 \end{acks}

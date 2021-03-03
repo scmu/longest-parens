@@ -2,7 +2,7 @@
 %%% Do NOT edit. File created by BibTeX with style
 %%% ACM-Reference-Format-Journals [18-Jan-2012].
 
-\begin{thebibliography}{5}
+\begin{thebibliography}{6}
 
 %%% ====================================================================
 %%% NOTE TO THE USER: you can override these defaults by providing
@@ -89,6 +89,17 @@
   folds}.
 \newblock \bibinfo{journal}{\emph{Science of Computer Programming (Special
   Issue: Mathematics of Program Construction (MPC 2002))}}  \bibinfo{volume}{51}, \bibinfo{pages}{87--116}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Zantema}{Zantema}{1992}]%
+        {Zantema:92:Longest}
+\bibfield{author}{\bibinfo{person}{Hans Zantema}.}
+  \bibinfo{year}{1992}\natexlab{}.
+\newblock \showarticletitle{Longest segment problems}.
+\newblock \bibinfo{journal}{\emph{Science of Computer Programming}}
+  \bibinfo{volume}{18}, \bibinfo{number}{1} (\bibinfo{year}{1992}),
+  \bibinfo{pages}{39--66}.
 \newblock
 
 

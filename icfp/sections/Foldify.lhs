@@ -33,7 +33,7 @@ optPreDer0 =
 \end{code}
 %if False
 \begin{code}
-unwrap :: Spine -> Tree
+unwrap :: Forest -> Tree
 unwrap [t] = t
 unwrap _   = Nul
 \end{code}
@@ -44,7 +44,7 @@ We introduce |unwrap :: Forest -> Tree|, defined by |unwrap [t] = t| and for all
 Recall that |inits = foldr (\x xss -> [] : map (x:) xss) [[]]|.
 The aim now is to fuse |map parseF|, |filtJust|, and |maxBy (size . unwrap)| with |inits|.
 
-By Theorem~\ref{thm:foldr-fusion}, to fuse |map parseF| with |inits|, we need to construct some |g| such that
+By Theorem~\ref{thm:foldr-fusion}, to fuse |map parseF| with |inits|, we need to construct |g| that meets the fusion condition:
 \begin{spec}
  map parseF ([] : map (x:) xss) = g x (map parseF xss) {-"~~."-}
 \end{spec}
@@ -119,7 +119,7 @@ In general, the largest singleton parse tree will also present in the the head o
 One can intuitively see why: if we print them both, the former is a prefix of the latter.
 Therefore, |unwrap . maxBy (size . unwrap)| can be replaced by |head . last|.
 
-To fuse |last| with |filtJust . map parseF . inits| by Theorem~\ref{thm:foldr-fusion}, we need to construct a function |step| that satisfies
+To fuse |last| with |filtJust . map parseF . inits| by Theorem~\ref{thm:foldr-fusion}, we need to construct a function |step| that satisfies the fusion condition
 \begin{spec}
  last ([Nul] : extend x tss) = step x (last tss) {-"~~,"-}
 \end{spec}
@@ -144,7 +144,7 @@ build = foldr step [Nul] {-"~~,"-}
 %}
 %if False
 \begin{code}
-step :: Char -> Spine -> Spine
+step :: Char -> Forest -> Forest
 step ')' ts        = Nul:ts
 step '(' [t]       = [Nul]
 step '(' (t:u:ts)  = Bin t u : ts {-"~~."-}
@@ -152,4 +152,4 @@ step '(' (t:u:ts)  = Bin t u : ts {-"~~."-}
 %endif
 which is now a total function on strings of parentheses.
 
-The function derived above turns out to be |inv prF| with one additional case (|step '(' [t] = [Nul]|). What we have done in section can be seen as justifying adding that case, which is not as trivial as one might think.
+The function derived above turns out to be |inv prF| with one additional case (|step '(' [t] = [Nul]|). What we have done in section can be seen as justifying adding that case (which is a result of case (1) in the fusion of |last|), which is not as trivial as one might think.

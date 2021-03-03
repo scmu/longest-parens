@@ -1,3 +1,13 @@
+%if False
+\begin{code}
+{-# LANGUAGE StandaloneDeriving #-}
+module ConvFnThm where
+
+import Data.List
+import Utilities
+\end{code}
+%endif
+
 \section{Converse-of-a-Function Theorem}
 
 Given a function |f :: b -> t|, the converse-of-a-function theorem \citep{BirddeMoor:97:Algebra, deMoorGibbons:00:Pointwise} constructs the relational converse --- a generalised notion of inverse --- of |f|.
