@@ -1,0 +1,26 @@
+\begin{thebibliography}{3}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Bird and de~Moor(1997)]{BirddeMoor:97:Algebra}
+R.~S. Bird and O.~de~Moor.
+\newblock \emph{Algebra of Programming}.
+\newblock Prentice Hall, 1997.
+\newblock ISBN 0-13-507245-X.
+
+\bibitem[de~Moor and Gibbons(2000)]{deMoorGibbons:00:Pointwise}
+O.~de~Moor and J.~Gibbons.
+\newblock Pointwise relational programming.
+\newblock In T.~Rus, editor, \emph{Algebraic Methodology and Software
+  Technology}, number 1816 in LNCS, pages 371--390. Springer-Verlag, 2000.
+
+\bibitem[Mu and Bird(2003)]{MuBird:03:Theory}
+S.-C. Mu and R.~S. Bird.
+\newblock Theory and applications of inverting functions as folds.
+\newblock \emph{Science of Computer Programming (Special Issue for Mathematics
+  of Program Construction)}, 51:\penalty0 87--116, 2003.
+
+\end{thebibliography}

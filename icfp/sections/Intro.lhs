@@ -25,7 +25,7 @@ After trying some of them, the authors decided on
 S -> epsilon | (S)S {-"~~,"-}
 \end{spec}
 because it is unambiguous and the most concise.
-Other grammars have worked too, however, albeit leading to lengthier algorithms.
+Other grammars have worked too, albeit leading to lengthier algorithms.
 The parse tree of the chosen grammar can be represented in Haskell as below,
 with a function |pr| specifying how a tree is printed:
 \begin{code}
@@ -56,7 +56,8 @@ Function |pr| is injective but not surjective: it does not yield un-balanced str
 Therefore its right inverse, that is, the function |inv pr| such that |pr (inv pr xs) = xs|, is partial;
 its domain is the set of balanced parenthesis strings.
 We implement it by a function that is made total by using the |Maybe| monad.
-This function |parse :: String -> Maybe Tree| builds a parse tree  --- |parse xs| should return |Just t| such that |pr t = xs| if |xs| is balanced, and return |Nothing| otherwise. We will construct |parse| more formally in Section~\ref{sec:spine}.
+This function |parse :: String -> Maybe Tree| builds a parse tree  --- |parse xs| should return |Just t| such that |pr t = xs| if |xs| is balanced, and return |Nothing| otherwise.
+While this defines |parse| already, a direct definition of |parse| will be presented in Section~\ref{sec:spine}.
 
 The problem can then be specified as below, where |lbs| stands for ``longest balanced segment (of parentheses)'':
 \begin{code}
@@ -83,7 +84,8 @@ The length-only problem can be specified by |lbsl = size . lbs|.
 \label{sec:inits-tails}
 
 It is known that many optimal segment problems can be solved by following a fixed pattern
-\cite{Bird:87:Introduction, Gibbons:97:Calculating}.
+\cite{Bird:87:Introduction, Gibbons:97:Calculating},
+which we refer to as \emph{prefix-suffix decomposition}.
 In the first step, finding an optimal segment is factored into finding, for each suffix, an optimal prefix.
 For our problem, the calculation goes:
 %if False
@@ -108,7 +110,7 @@ For each suffix returned by |tails|, the program above computes its longest \emp
 Calling |lbp| for each suffix is rather costly.
 The next step is to try to apply the following \emph{scan lemma},
 which says that if a function |f| can be expressed as right fold,
-there is a more efficient algorithm to compute |map f . inits|:
+there is a more efficient algorithm to compute |map f . tails|:
 \begin{lemma}
 \label{lma:scan-lemma}
 {\rm

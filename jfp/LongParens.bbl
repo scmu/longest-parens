@@ -1,0 +1,22 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citename{Bird \& de~Moor, }1997]{BirddeMoor:97:Algebra}
+Bird, R.~S. and de~Moor, O. (1997)
+\newblock {\em Algebra of Programming}.
+\newblock Prentice Hall.
+
+\bibitem[\protect\citename{de~Moor \& Gibbons,
+  }2000]{deMoorGibbons:00:Pointwise}
+de~Moor, O. and Gibbons, J. (2000)
+\newblock Pointwise relational programming.
+\newblock  Rus, T. (ed), {\em Algebraic Methodology and Software Technology}.
+\newblock LNCS, no.  1816, pp.  371--390.
+\newblock Springer-Verlag.
+
+\bibitem[\protect\citename{Mu \& Bird, }2003]{MuBird:03:Theory}
+Mu, S.-C. and Bird, R.~S. (2003)
+\newblock Theory and applications of inverting functions as folds.
+\newblock {\em Science of Computer Programming (Special Issue for Mathematics
+  of Program Construction)} {\bf 51}:87--116.
+
+\end{thebibliography}

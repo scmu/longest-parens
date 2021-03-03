@@ -17,7 +17,7 @@ For example, |xs = "(())()))()"| is left-partially balanced because |"((" ++ xs|
 As a counter example, the string |ys = "()(()"| is not left-partially balanced --- due to the unmatched |'('| in the middle of |ys|, there is no |zs| such that |zs++ys| is balanced.
 
 While parsing a fully balanced string cannot be expressed as a right fold, it is possible to parse left-partially balanced strings using a right fold.
-In this section we consider what data structure such a string should be parsed to, how to parse it, and finally formally define |parse|.
+In this section we consider what data structure such a string should be parsed to, how to parse it, and present a direct definition of |parse|.
 
 A left-partially balanced string can always be uniquely factored into a sequence of balanced substrings, separated by one or more right parentheses.
 For example, |xs| can be factored into two balanced substrings, |"(())()"| and |"()"|, separated by |"))"|.
@@ -39,8 +39,9 @@ where |Bin (Bin Nul Nul) (Bin Nul Nul)| prints to |"()(())"|,
 |Bin Nul Nul| prints to |"()"|, and there is a |Nul| between
 them due to the consecutive right parentheses |"))"| in |xs|.
 One can verify that |prF ts = xs| indeed.
-Note that we can let the type |Forest| be \emph{non-empty} lists of trees, since the empty string can be represented by |[Nul]|: |prF [Nul] = pr Nul = ""|.
-\footnote{We have also tried an equivalent representation: |Forest = ([Tree], Tree)|. Presentation-wise, both representations have their pros and cons, and we eventually decided on non-empty lists.}
+Note that we let the type |Forest| be \emph{non-empty} lists of trees.
+\footnote{We can let the non-emptiness be more explicit by letting |Forest = (Tree, [Tree])|. Presentation-wise, both representations have their pros and cons, and we eventually decided on using a list.}
+The empty string can be represented by |[Nul]|: |prF [Nul] = pr Nul = ""|.
 
 The aim now is to construct the right inverse of |prF| using Theorem~\ref{thm:conv-fun} --- thereby parsing a left-partially balanced string using a right fold.
 It will be easier if we first construct a new definition of |prF|, one that is inductive, does not use |(++)|, and does not rely on |pr|.

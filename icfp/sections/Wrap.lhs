@@ -69,18 +69,18 @@ lbsl = maximum . map head . scanr step [0] {-"~~,"-}
 \label{sec:conclude}
 
 So we have derived a linear-time algorithm for solving the problem.
-We find it an interesting journey because it involves two techniques:
-the usual approach for solving segment problems, and the converse-of-a-function theorem. We hope the reader enjoyed this journey too.
+We find it an interesting journey because it relates two techniques:
+prefix-suffix decomposition for solving segment problems, and the converse-of-a-function theorem for program inversion.
 
 In Section~\ref{sec:spine} we generalised from trees to forests.
 It is common when applying the converse-of-a-function theorem.
-It was observed that the trees in the forest are those alone the left spine of the final tree, therefore such a generalisation is referred to as switching to a ``spine representation'' \cite{MuBird:03:Theory}.
+It was observed that the trees in a forest are those along the left spine of the final tree, therefore such a generalisation is referred to as switching to a ``spine representation'' \cite{MuBird:03:Theory}.
 
 What we derived in Section~\ref{sec:spine} and \ref{sec:foldify} is a compacted form of shift-reduce parsing, where the forest serves as the stack, and the input is processed right-to-left.
 If we were to process the input left-to-right as is often done in parsing, the corresponding grammar would be |S -> epsilon || S(S)|.
 It is an SLR(1) grammar whose parse table contains 5 states.
 Our program is much simpler.
-A possible reason is that several shifting and reducing actions are condensed into one step.
+A possible reason is that consecutive shifting and reducing are condensed into one step.
 It is likely that parsing SLR(1) grammars can be done in a fold.
 The relationship between LR parsing and the converse-of-a-function theorem awaits further investigation.
 

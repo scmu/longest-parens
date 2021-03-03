@@ -1,0 +1,95 @@
+%%% -*-BibTeX-*-
+%%% Do NOT edit. File created by BibTeX with style
+%%% ACM-Reference-Format-Journals [18-Jan-2012].
+
+\begin{thebibliography}{5}
+
+%%% ====================================================================
+%%% NOTE TO THE USER: you can override these defaults by providing
+%%% customized versions of any of these macros before the \bibliography
+%%% command.  Each of them MUST provide its own final punctuation,
+%%% except for \shownote{}, \showDOI{}, and \showURL{}.  The latter two
+%%% do not use final punctuation, in order to avoid confusing it with
+%%% the Web address.
+%%%
+%%% To suppress output of a particular field, define its macro to expand
+%%% to an empty string, or better, \unskip, like this:
+%%%
+%%% \newcommand{\showDOI}[1]{\unskip}   % LaTeX syntax
+%%%
+%%% \def \showDOI #1{\unskip}           % plain TeX syntax
+%%%
+%%% ====================================================================
+
+\ifx \showCODEN    \undefined \def \showCODEN     #1{\unskip}     \fi
+\ifx \showDOI      \undefined \def \showDOI       #1{#1}\fi
+\ifx \showISBNx    \undefined \def \showISBNx     #1{\unskip}     \fi
+\ifx \showISBNxiii \undefined \def \showISBNxiii  #1{\unskip}     \fi
+\ifx \showISSN     \undefined \def \showISSN      #1{\unskip}     \fi
+\ifx \showLCCN     \undefined \def \showLCCN      #1{\unskip}     \fi
+\ifx \shownote     \undefined \def \shownote      #1{#1}          \fi
+\ifx \showarticletitle \undefined \def \showarticletitle #1{#1}   \fi
+\ifx \showURL      \undefined \def \showURL       {\relax}        \fi
+% The following commands are used for tagged output and should be
+% invisible to TeX
+\providecommand\bibfield[2]{#2}
+\providecommand\bibinfo[2]{#2}
+\providecommand\natexlab[1]{#1}
+\providecommand\showeprint[2][]{arXiv:#2}
+
+\bibitem[\protect\citeauthoryear{Bird}{Bird}{1987}]%
+        {Bird:87:Introduction}
+\bibfield{author}{\bibinfo{person}{Richard~S. Bird}.}
+  \bibinfo{year}{1987}\natexlab{}.
+\newblock \showarticletitle{An introduction to the theory of lists}.
+\newblock In \bibinfo{booktitle}{\emph{Logic of Programming and Calculi of
+  Discrete Design}}, \bibfield{editor}{\bibinfo{person}{Manfred Broy}} (Ed.).
+  \bibinfo{series}{NATO ASI Series F: No. 36}.
+  \bibinfo{publisher}{Springer-Verlag}, \bibinfo{pages}{5--42}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Bird and de~Moor}{Bird and de~Moor}{1997}]%
+        {BirddeMoor:97:Algebra}
+\bibfield{author}{\bibinfo{person}{Richard~S. Bird} {and}
+  \bibinfo{person}{Oege de Moor}.} \bibinfo{year}{1997}\natexlab{}.
+\newblock \bibinfo{booktitle}{\emph{Algebra of Programming}}.
+\newblock \bibinfo{publisher}{Prentice Hall}.
+\newblock
+\showISBNx{0-13-507245-X}
+
+
+\bibitem[\protect\citeauthoryear{de~Moor and Gibbons}{de~Moor and
+  Gibbons}{2000}]%
+        {deMoorGibbons:00:Pointwise}
+\bibfield{author}{\bibinfo{person}{Oege de Moor} {and} \bibinfo{person}{Jeremy
+  Gibbons}.} \bibinfo{year}{2000}\natexlab{}.
+\newblock \showarticletitle{Pointwise relational programming}. In
+  \bibinfo{booktitle}{\emph{Algebraic Methodology and Software Technology}}
+  \emph{(\bibinfo{series}{LNCS 1816})}, \bibfield{editor}{\bibinfo{person}{Teodor
+  Rus}} (Ed.). \bibinfo{publisher}{Springer-Verlag}, \bibinfo{pages}{371--390}.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Gibbons}{Gibbons}{1997}]%
+        {Gibbons:97:Calculating}
+\bibfield{author}{\bibinfo{person}{Jeremy Gibbons}.}
+  \bibinfo{year}{1997}\natexlab{}.
+\newblock \showarticletitle{Calculating Functional Programs}. In
+  \bibinfo{booktitle}{\emph{Proceedings of ISRG/SERG Research Colloquium}}.
+  Oxford Brookes University.
+\newblock
+
+
+\bibitem[\protect\citeauthoryear{Mu and Bird}{Mu and Bird}{2003}]%
+        {MuBird:03:Theory}
+\bibfield{author}{\bibinfo{person}{Shin-Cheng Mu} {and}
+  \bibinfo{person}{Richard~S. Bird}.} \bibinfo{year}{2003}\natexlab{}.
+\newblock \showarticletitle{Theory and applications of inverting functions as
+  folds}.
+\newblock \bibinfo{journal}{\emph{Science of Computer Programming (Special
+  Issue: Mathematics of Program Construction (MPC 2002))}}  \bibinfo{volume}{51}, \bibinfo{pages}{87--116}.
+\newblock
+
+
+\end{thebibliography}

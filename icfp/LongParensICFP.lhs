@@ -59,9 +59,27 @@ An Exercise in Program Inversion in a Segment Problem.
 %\renewcommand{\shortauthors}{Mu and Chiang}
 
 \begin{abstract}
-Given a string of parentheses, the task is to derive a linear-time algorithm to find the longest consecutive segment that is balanced.
-We find it an interesting problem because it involves two techniques: the usual approach for solving segment problems, and a theorem for constructing the inverse of a function --- through which we derive an instance of shift-reduce parsing.
+Given a string of parentheses, the task is to find the longest consecutive segment that is balanced, in linear time.
+We find this problem interesting because it involves techniques: the usual approach for solving segment problems, and a theorem for constructing the inverse of a function --- through which we derive an instance of shift-reduce parsing.
 \end{abstract}
+
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10003752.10010124.10010138</concept_id>
+<concept_desc>Theory of computation~Program reasoning</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10011007.10011006.10011008.10011009.10011012</concept_id>
+<concept_desc>Software and its engineering~Functional languages</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Theory of computation~Program reasoning}
+\ccsdesc[500]{Software and its engineering~Functional languages}
 
 \keywords{program derivation, segment problems, program inversion, parsing}
 
