@@ -1,0 +1,94 @@
+%if not lhs2tex_Formatting_fmt_read
+%let lhs2tex_Formatting_fmt_read = True
+
+%if style /= newcode
+\ReadOnlyOnce{Formatting.fmt}%
+\makeatletter
+
+\let\Varid\mathit
+\let\Conid\mathsf
+
+\def\commentbegin{\quad\{\ }
+\def\commentend{\}}
+
+\newcommand{\ty}[1]{\Conid{#1}}
+\newcommand{\con}[1]{\Conid{#1}}
+\newcommand{\id}[1]{\Varid{#1}}
+\newcommand{\cl}[1]{\Varid{#1}}
+\newcommand{\opsym}[1]{\mathrel{#1}}
+
+\newcommand\Keyword[1]{\textbf{\textsf{#1}}}
+\newcommand\Hide{\mathbin{\downarrow}}
+\newcommand\Reveal{\mathbin{\uparrow}}
+
+%% Typesetting standard symbols
+
+%format == = "\doubleequals"
+%format . = "\mathbin{\cdot}"
+%format `app` = "\mathbin{\$}"
+%format app = "(\mathbin{\$})"
+%format ++ = "\mathbin{+\!\!\!\!\!+}"
+
+%format <=> = "\mathrel{\equiv}"
+%format ==> = "\mathrel{\Rightarrow}"
+%format === = "\mathbin{=}"
+
+%format *** = "\times"
+%format /=  = "\mathbin{\not\doubleequals}"
+%format inv f = "{" f "}^{\hstretch{0.5}{-}1}"
+%format total f = "{" f "}^{\triangledown}"
+
+%format <=< = "\mathrel{\hstretch{0.7}{<\!\!\!=\!\!<}}"
+%format >=> = "\mathrel{\hstretch{0.7}{>\!\!=\!\!\!>}}"
+%format =<< = "\mathbin{\hstretch{0.7}{=\!\!<\!\!<}}"
+%format << = "\mathbin{\hstretch{0.7}{<\!\!<}}"
+%format >> = "\mathbin{\hstretch{0.7}{>\!\!>}}"
+%format >>= = "\mathrel{\hstretch{0.7}{>\!\!>\!\!=}}"
+%% Symbols that are convenient to have
+
+%format Nat = "\mathbb{N}"
+%format ListP a = "\lbrack" a "\rbrack^{+}"
+
+%format oplus = "(\oplus)"
+%format `oplus` = "\mathbin{\oplus}"
+%format otimes = "(\otimes)"
+%format `otimes` = "\mathbin{\otimes}"
+%format `odot` = "\mathbin{\odot}"
+%format odot = "(\odot)"
+%format `ocirc` = "\mathbin{\circledcirc}"
+%format ocirc = "(\circledcirc)"
+%format `ominus` = "\mathbin{\ominus}"
+%format ominus = "(\ominus)"
+%format unlhd = "(\unlhd)"
+%format `unlhd` = "\mathrel{\unlhd}"
+%format preceq = "(\preceq)"
+%format `preceq` = "\mathrel{\preceq}"
+
+%% paper-specific declarations
+
+%format epsilon = "\epsilon"
+%format initsP = "\Varid{inits}_{+}"
+%format bl = "(\oplus)"
+%format `bl` = "\oplus"
+%format ml = "(\oplus)"
+%format `ml` = "\oplus"
+
+%% coloring
+
+%format (txbr (x)) = "\txbr{" x "}"
+%format (txbl (x)) = "\txbl{" x "}"
+%format (txtl (x)) = "\txtl{" x "}"
+
+%% subscripted variables
+
+%format x0
+%format x1
+%format xn = "\Varid{x}_{\Varid{n}}"
+%format y0
+%format y1
+%format yn = "\Varid{y}_{\Varid{n}}"
+
+\makeatother
+\EndFmtInput
+%endif
+%endif

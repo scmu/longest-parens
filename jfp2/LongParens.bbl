@@ -1,0 +1,51 @@
+\begin{thebibliography}{}
+
+\bibitem[\protect\citename{Bird, }1987]{Bird:87:Introduction}
+Bird, R.~S. (1987)
+\newblock An introduction to the theory of lists.
+\newblock  Broy, M. (ed), {\em Logic of Programming and Calculi of Discrete
+  Design}.
+\newblock NATO ASI Series F, no. ~36, pp.  5--42.
+\newblock Springer.
+
+\bibitem[\protect\citename{Bird \& de~Moor, }1997]{BirddeMoor:97:Algebra}
+Bird, R.~S. and de~Moor, O. (1997)
+\newblock {\em Algebra of Programming}.
+\newblock Prentice Hall.
+
+\bibitem[\protect\citename{de~Moor \& Gibbons,
+  }2000]{deMoorGibbons:00:Pointwise}
+de~Moor, O. and Gibbons, J. (2000)
+\newblock Pointwise relational programming.
+\newblock  Rus, T. (ed), {\em Algebraic Methodology and Software Technology}.
+\newblock LNCS, no.  1816, pp.  371--390.
+\newblock Springer.
+
+\bibitem[\protect\citename{Gibbons, }1997]{Gibbons:97:Calculating}
+Gibbons, J. (1997)
+\newblock Calculating functional programs.
+\newblock  {\em Proceedings of ISRG/SERG Research Colloquium}.
+\newblock Oxford Brookes University.
+
+\bibitem[\protect\citename{Mu \& Bird, }2003]{MuBird:03:Theory}
+Mu, S.-C. and Bird, R.~S. (2003)
+\newblock Theory and applications of inverting functions as folds.
+\newblock {\em Science of Computer Programming (Special Issue for Mathematics
+  of Program Construction)} {\bf 51}:87--116.
+
+\bibitem[\protect\citename{Sasano {\em et~al.}\relax,
+  }2001]{SasanoHu:01:Generation}
+Sasano, I., Hu, Z. and Takeichi, M. (2001)
+\newblock Generation of efficient programs for solving maximum multi-marking
+  problems.
+\newblock  {\em ACM SIGPLAN Workshop on Semantics, Applications and
+  Implementation of Program Generation (SAIG'01)}.
+\newblock LNCS, no.  2196, pp.  72--91.
+\newblock Springer.
+
+\bibitem[\protect\citename{Zantema, }1992]{Zantema:92:Longest}
+Zantema, H. (1992)
+\newblock Longest segment problems.
+\newblock {\em Science of Computer Programming} {\bf 18}(1):39--66.
+
+\end{thebibliography}

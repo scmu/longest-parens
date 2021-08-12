@@ -1,0 +1,431 @@
+This is a re-submission of our previous paper (manuscript number JFP-2020-0042).
+
+The authors would like to thank the reviewers for their detailed and constructive criticisms. That helped a lot in improving this work. This new version has gone through some major changes, including:
+
+* Section 1 is revised to give some motivation --- why we study this problem, and why the solution here might be of interest.
+
+* Section 4 (was Section 3), which motivates the spine tree, has been rewritten. It is now significantly simplified thanks to the suggestion of a reviewer. We hope the new way to introduce the data structure (which is now not called a Spine, but simply a Forest) is more intuitive.
+
+* Section 5 (was Section 4) where we justify foldr-fusion is rewritten and simplified. The Appendix is no longer needed and removed.
+
+* More explanation and connection with parsing added in Section 4 and Section 7.
+
+* More references added in Section 1 and 7.
+
+* We ran a simple experiment to confirm that the algorithm runs in linear time.
+
+Detailed responses are given below, where our responses start with ">".
+
+## Response to Editor
+
+Personally, I'd like you to start with a short discussion about the
+purpose of the pearl: eg just fun, simple example of parsing longest
+prefixes (for error reporting), simple example of using scans ...
+
+> We tried to give some explanation and motivation in the first section.
+
+## Responses to Referee 1
+
+This pearl gives a very readable account of the derivation of a problem which is clearly and concisely stated in the first sentence. But perhaps it would be even better to also include an opening statement about why this particular segment problem is useful to functional programmers?
+
+> The first paragraph is revised and extended with some brief statement: "While there is no direct application of this problem, the authors find it interesting because it involves two techniques... ", etc.
+
+The paper contains a succession of nice, simple derivations that are easy to follow and make the whole derivation process appear very natural. The inclusion of illustrations like Fig. 1 also adds to the sense of gently guiding the reader along the journey.
+
+I only have a few very minor comments:
+
+Since Section 1 is written in a style of “the usual routine” perhaps it would be useful to add a citation at the start to one of the classic papers, for the benefit of the uninitiated reader?
+
+> We cited Bird (1987), Gibbons (1997), Zantema (1992).
+
+L128 typo: “represent” should be “represents”
+
+> That part of the paper has been rewritten.
+
+L223 typo: “unwarp”
+
+> corrected.
+
+I found a couple of the proof justifications a little opaque, e.g.
+
+L 220 : { see below }
+
+L 289: { discussion above }
+
+But I can’t think of a good way to make them more precise. I suppose you could define max_<= before the p 7 calculation or just not define it at all, and instead just say, before “In summary, we have…” :
+
+Since maxBy (size. unwrap) means choosing the maximum by <=, we have:
+maxBy (size · unwrap) · map build · inits  = last · map build · inits.    (4.2)
+and then just use 4.2 in the justification of the calculation. But I’m really not sure that’s any better.
+
+> That part of the calculation has been re-written.
+
+L 301/2: here there is no justification, which looks a bit odd, so ideally add something.
+
+> The calculation is slightly revised, and the particular step has been removed.
+
+
+## Responses to Referee 2
+
+Summary and evaluation
+----------------------
+The pearl calculates a function that takes a list of brackets and
+finds the a longest contiguous subsequence in which brackets are
+balanced.  The function that is calculated runs in linear time.
+(I can't decide if I should be surprised that the longest balanced
+sequence can be found in linear time.)  The calculation draws key
+ideas from LR parsing (reversed), and it builds on the
+converse-of-a-function theorem to express a parser as a fold.
+Converting the fold to a scan gives the linear-time behavior.
+
+I judge a functional pearl by these criteria (Bird, 2006):
+
+A functional pearl is meant to be polished, elegant, instructive, and entertaining.
+Ideal pearls are "grown from real problems that have irritated programmers."
+Pearls contain:
+• Instructive examples of program calculation or proof;
+• Nifty presentations of old or new data structures;
+• Interesting applications and programming techniques.
+
+This submission was not able to hold my interest.
+Here are some elements I found disappointing:
+
+ * The problem has deep connections with parsing, but those
+   connections are not elucidated to my satisfaction.  
+
+ * The treatment of partially parsed trees is more complicated than I
+   had hoped for.
+
+ * During the detours of sections 3 and 4, I lost track of the big
+   picture.
+
+ * The submission takes a roundabout path from inputs, to trees, to
+   spines, back to inputs.  But I think a lot could be done with
+   inputs directly.  See my suggestion below, which I think renders a
+   lot of the development here superfluous.
+
+ * The introduction suggests that the choice of
+   grammar/representation is arbitrary.  But I'm not at all sure that
+   the development works with any other choice---and on this topic,
+   the submission is silent.
+
+ * The subtitle of the submission suggests a focus on program inversion.
+   The actual delivery gives a limited example of a limited form of
+   program inversion.  I don't think it delivers on the promise
+   implied by the title.
+
+ * The proof in Appendix A is not a good advertisement for equational
+   reasoning.
+
+> We tried to justify the step corresponding to Appendix A in a different way. The appendix is therefore not needed and removed.
+
+
+Suggestion for the author
+-------------------------
+To cut through a lot of the development here, consider what is a
+prefix [suffix] of a properly bracketed sequence.  It is a sequence of
+"items" wherein each item is either a left [right] bracket or a
+properly bracketed sequence.  The suffix is your spine; here are some
+possible representations:
+
+   data Item = Tree Tree | Right
+   type Spine = [Item]
+
+   ----  { since a Tree can be empty, we can make them alternate }
+
+   data Right = Right
+   type Spine = ([(Tree, Right)], Tree)
+
+   ----  { make the right bracket implicit }
+
+   type Spine = ([Tree], Tree)
+
+   ----  { make "nonempty" a dynamic invariant, not enforced by the type }
+
+   type Spine = [Tree]
+
+It might now be useful to define these functions:
+
+   consRight :: Spine -> Spine
+   consLeft  :: Spine -> Spine
+
+   consRight trees = Null : trees
+   consLeft  (t1 : t2 : ts) = makeTree Left t1 Right t2 : ts
+   consLeft  _ : _ = [Null] -- unbalanced; must start over
+
+This development eliminates the choice on lines 20 and 23 of your
+submission, which is presented as arbitrary.  That representation is
+now revealed as *necessary* because it is the natural representation
+that supports the `consLeft` operation.
+
+I believe that if each tree is annotated with its length and each
+spine is annotated with the length of its longest tree, then the
+entire problem can be solved by `foldr`:
+
+   lbp = best . foldr cons null
+      where cons '(' = consLeft
+            cons ')' = consRight
+            null = annotate [Null]
+
+
+> Thank you very much. We have rewritten the section motivating the Spine --- which is not called a Spine anymore, but simply a Forest. The new explanation of the spine, while not completely follow yours, is very much inspired by your ideas above. We hope the new version is better.
+
+Detailed comments for the author
+--------------------------------
+Since the task you pose is it not inherently interesting, I'd like
+your paper to open with some statement about what we can expect to
+find pearly in the presentation below.  Is the main accomplishment to
+solve the task in linear time?
+
+> We added some justification in Section 1: "While there is no direct application of this problem, the authors find it interesting because it involves two techniques.
+Firstly, derivation for such optimal segment problems ...  usually follows a certain pattern. We would like to see how well that works for this case. Secondly, at one point we will need to construct the right inverse of a function. It will turn out that we will discover an instance of shift-reduce parsing."
+
+On line 20, I'm curious about what happens if you choose a different
+grammar. What happens to your development?
+
+> We tried other grammars (e.g. S -> T* and T -> (S)), and they work too. However, the more complex the grammar, the more complex the algorithm. The grammar S -> epsilon | (S)S is the shortest we can find.
+
+> Added in Section 1: "... the authors decided on S -> epsilon | (S)S because it is unambiguous and the most concise. Other grammars have worked too, albeit leading to lengthier algorithms."
+
+On line 29, a type for function `lbp` would not be out of place.
+
+> Added a type.
+
+I can't help but think that functions `pr` and `parse` go together.
+Having them separated by the formal statement of the problem is not
+helping. Especially since you can't read the problem statement until
+you know about `parse`.
+
+> Section 1 is revised. Now we introduce both `pr` and `parse` before presenting the problem specification.
+
+The statement on line 35 is a little misleading. While it is
+technically correct that `inits` produces the prefixes of *its* input
+list, the meaning of the phrase "input list" changes from place to
+place on line 31.  I could easily think you meant the list that is
+input to the *composition.* I would rather read that `tails` computes
+all suffixes of the input list and then `map inits` computes all the
+prefixes of those suffixes.
+
+> We meant to give a general description of what inits and tails does.
+> The sentence is changed (slightly) to "inits, tails :: [a] -> [[a]] respectively computing all prefixes and suffixes of their input lists." Hope that is clearer.
+
+On line 66, I don't know why the next step is usually to apply the
+scan lemma.   What's usual about the scan lemma?  Would that happen in
+all derivations?  Is it because the goal is a linear-time solution?
+Is it because of particular problem you've chosen?
+
+> It happens in many derivations of such segment problems. When the lemma is applicable, it often improves efficiency of the algorithm asymptotically.
+
+> We have adjusted the tone of this part, hoping to make it clearer that the two step process ("prefix-suffix decomposition" and then "scan lemma") is a common pattern.
+
+Lines 80 and 81 are the first place where I get a hint about what
+might make your paper interesting. That's too long to make me wait.
+
+> It is hard to move the exact statement in lines 80 and 81 earlier, since we need to explain the background. But we tried to give some information "why what we do is interesting" (at least to us) in the first paragraph of this paper.
+
+I was confused by the typographic choices starting on line 129. I'd
+like that presentation to open with the idea that you've got
+metavariables $t$, $u$, and $v$ that stand for trees.  Please show us
+those metavariables in italics.  Then when you present the string used
+to construct the tree in Figure 1, write those metavariables in
+italics even in the string itself.
+
+> That section is rewritten. We do not have metavariables in strings anymore.
+
+"Balanced brackets" is a problem that screams "parsing" and "pushdown
+automata."  So at the beginning of section 3, the obvious game is LR
+parsing with a stack. I suppose you could put an analogous
+right-to-left parsing also with a stack. But some relationship with
+standard stuff on parsing would be appreciated here.
+
+I recognize that you have a problem: the standard literature on
+parsing works from left to right, but the standard literature on folds
+works from right to left.  This is nobody's fault, but in order to
+help readers overcome this inconsistency, I expect you to work extra
+hard.
+
+> Discussion added in Section 7.
+
+On line 137, "along" is misspelled as "alone."
+
+> Corrected.
+
+I think the presentation of the spine should be followed immediately
+by the presentation on lines 148 to 154.  That way we can be confident
+that we understand what the spine data structure represents.  Before
+you show how a spine is converted to a tree, show us how the spine is
+rendered as a string.
+
+> That section is rewritten.
+
+I'd also really like to see a parser that just uses an explicit stack.
+I think that would make everything clearer.
+
+Starting on line 193, I'd like to see this analogy developed in much
+greater depth.  Since what you have is effectively a parsing problem,
+the parallels deserve to be made explicit.  I'm not sure where is the
+right place to develop this analogy, but earlier might have been
+better.
+
+> We tried to mention the connection in Section 4. A discussion is also added in Section 7.
+
+On line 224 the name of the function `unwrapM` is misspelled.
+
+> Corrected.
+
+As we get to section 4, I'm losing interest.
+
+On line 244, it seems to me that we are now leaving principled derivation behind.
+
+On line 257, if I understand what's going on, the use of `build`
+*does* generate something new: it generates a list of null spines.
+These look harmless, as a null sequence is always balanced, and
+`maxBy` will discard duplicates.
+
+> This part is rewritten and simplified.
+
+Appendix A looked gnarly. It's not a good fit for a pearl.
+
+> We tried to justify the step corresponding to Appendix A in a different way. The appendix is therefore not needed and removed.
+
+On lines 264 to 275, I am not following the development easily, and I
+am not motivated to work hard to follow it.  Is your ordering going to
+replace the composition of `size` and `unwrap`, or what?
+
+> This part has been rewritten.
+
+On lines 302, 304, 308, and 312, I'm not sure I trust the application
+of `head` to the result of `maxBy`.  I'm having trouble reconciling
+that with lines 301, 29, and others.
+
+> This part has been rewritten.
+
+On lines 325 to 328, this reveal comes quite late.  It probably
+belongs in the very first paragraph, not the very last.
+
+> These statements are moved to the beginning of the paper.
+
+## Responses to Referee 3
+
+This is a nice paper, generally well written, and eminently fitting the role of a `pearl'. It would be publishable `as is', despite a few minor errors that would probably not lead the attentive reader astray. The reason that I nevertheless recommend revision is a combination of two aspects.
+
+The first is that at a crucial point, around proposition (4.1), the development unexpectedly takes a turn to handwaving, as if the authors expect readers to be fed up at this point and wanting this to be over as soon as possible. Surely, this can be presented more carefully. And then, the interested reader who takes the effort to study the proof (``a tricky task'') given in an appendix may hope to be rewarded by a clear presentation, but then will be disappointed. This appears not to be a fundamental flaw, but one that can be remedied in a revision.
+
+Additionally, there is a long list of (by themselves entirely minor) roughnesses that can bear being polished. The paper is interesting enough to deserve a high shine.
+
+
+## Responses to Referee 4
+
+1. Although your paper does not claim to be a tutorial, it could
+helpfully provide a little more by way of references to assist the
+proverbial 'new reader'. For example, references could helpfully be
+given on p2 so that readers know what is meant in explanations such as
+'we proceed by the usual routine' and 'The next step is usually to
+apply the "scan lemma"'.  These suggestions of places where citations
+might helpfully be added are illustrative not exhaustive: continuing
+the pattern you might at least look at any other places where you say
+"usual" or "usually"; to give one other example, p8 refers to "the
+usual approach for solving segment problems".
+
+> Some reference were added to Section 1. We also tried to better explain decisions such as the use of the scan lemma.
+
+2. As the problem turns on fold formulations, and inversion of folding
+functions, I did wonder whether some reference might be made to
+previous explorations of fold expressiveness and the applicability of
+unfold.  For example, I recall Hutton's tutorial on the expressiveness
+of fold and Gibbons and Jones' paper on unfold.  These are both from
+around 20 years ago; there may be other more appropriate and recent
+sources I am unaware of.
+
+> We are aware of Gibbons and Jones' paper on the if-and-only-if conditions when a function is a fold or an unfold. However, we felt that these will be a bit off-topic and make the paper unnecessarily long. We did add some more references to alternative algorithms for this problems.
+
+3. Section 5 refers to "an algorithm that runs in linear-time".  This
+way of putting it suggests that you have embedded your solution in a
+small program, presumably written in Haskell, and have tested it on a
+range of large inputs.  It would be nice to have this confirmation, as
+expectations of linear behaviour can sometimes be tempered by
+implementation issues.  I am not asking for a full-scale empirical
+evaluation.
+
+> Thank you for the suggestion! We ran some experiments and included the results.
+
+4. The paper begins and ends with the problem to find a maximal
+well-matched segment in a bracket list.  Although the problem has its
+interesting features, from what you say it was contrived as an
+interesting calculational challenge.  The solution itself does not
+obviously have wide application.  However, perhaps the methods you
+used for this derivation would also be applicable to a wider class of
+problems involving segments and inverses.  Could you say something
+about this wider class, with examples?  Where does the boundary lie
+between feasible and infeasible problems?
+
+> This is actually a difficult question --- we find it hard to think of a problem involving both segments and inverses, and does not seem contrived.
+> A natural extension to this problem would be to consider more general classes of grammars. But that turns out to be much more complex and needs more investigation.
+> We added some discussions in the last section.
+
+5. My last broad comment actually concerns a point of detail, but it
+recurs throughout the paper.  I found it distracting to have
+punctation such as commas, conjunctions and stops after equations that
+are part of function specifications or declarations.  Unless such
+punctuation is preferred by JFP, please consider removing it.
+
+> For other submissions, we heard from reviewers suggesting that we should use proper punctuations for math equations as if they were nouns. It seems that whether equations should come with punctuations have been discussed at great length. Knuth  seems to have suggested adding punctuations (http://tex.loria.fr/typographie/mathwriting.pdf). There are counter-opinions too, but for now we would prefer to having them. We hope that is okay!
+
+Typographical errors and suggested rephrasing:
+
+p1 "respectively comput[e -> ing] all prefixes and suffixes"
+
+> Corrected.
+
+p2 "[shall be -> must be reformulated as] a foldr too"
+
+> Revised.
+
+p3 omit xs in f^{-1} = foldr step base xs
+
+> Corrected.
+
+p3 "whose input/s/ are not"
+
+> Rewritten.
+
+p3 "a data structure that represent/s/ partially built trees"
+
+> That section is rewritten.
+
+p3 "[One may infer that we should -> So we choose to]
+
+> That section is rewritten.
+
+p3 "[alone -> along] the left spine"
+
+> That section is rewritten.
+
+p5 "[for clarity, we prefer to observe partiality explicitly ->
+    we prefer to make the partiality explicit]"
+
+> Revised.
+
+p5 "Recall our objective /at the close of Section 1/"
+
+> Revised.
+
+p5 "[unwarpM -> unwrapM]"
+
+> Corrected.
+
+p6 "some other prefix [anyway]"
+
+> That part is rewritten.
+
+p6 "generalise the process[ to -> ,] picking a maximum
+
+> That part is rewritten.
+
+p7 "the actual tree/s/, but only their sizes"
+
+> Corrected.
+
+p7 please avoid page break separating step equations
+
+> Tried to group step equations together in this submission.
