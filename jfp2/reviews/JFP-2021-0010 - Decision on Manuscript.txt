@@ -1,0 +1,133 @@
+From: Journal of Functional Programming <onbehalfof@manuscriptcentral.com>
+Subject: JFP-2021-0010 - Decision on Manuscript
+Date: August 8, 2021 at 4:31:50 AM GMT+8
+To: scm@iis.sinica.edu.tw
+Cc: sk@cs.brown.edu, jeremy.gibbons@cs.ox.ac.uk, jfp-ed@cambridge.org, prof-pearls@online.de, scm@iis.sinica.edu.tw, tsungju@pm.me
+Reply-To: prof-pearls@online.de
+
+Dear Shin,
+
+Manuscript ID JFP-2021-0010 entitled "Longest Segment of Balanced
+Parentheses: an Exercise in Program Inversion in a Segment Problem"
+which you submitted to the Journal of Functional Programming, has been
+reviewed.  The comments of the referees are included at the bottom of
+this letter.
+
+The referees are mostly happy with the revision but have identified
+some minor problems/typos. Therefore, I invite you to revise your
+manuscript a second time - this round shouldn't take too long.
+
+Cheers, Ralf
+
+-------------------------------------------------------------------------------
+
+Dear Dr. Mu:
+
+Manuscript ID JFP-2021-0010 entitled "Longest Segment of Balanced Parentheses: an Exercise in Program Inversion in a Segment Problem" which you submitted to the Journal of Functional Programming, has been reviewed.  The comments of the referees are included at the bottom of this letter.
+
+The referees have suggested some minor revisions to your manuscript.  Therefore, I invite you to respond to the comments and revise your manuscript.
+
+To revise your manuscript, log into https://mc.manuscriptcentral.com/jfp_submit and enter your Author Center, where you will find your manuscript title listed under "Manuscripts with Decisions."  Under "Actions," click on "Create a Revision."  Your manuscript number has been appended to denote a revision.
+
+You will be unable to make your revisions on the originally submitted version of the manuscript.  Instead, please upload your revised manuscript through your Author Center.
+
+When submitting your revised manuscript, you will be able to respond to the comments made by the referees in the space provided.  You can use this space to document any changes you make to the original manuscript.  In order to expedite the processing of the revised manuscript, please be as specific as possible in your response to the referees.
+
+IMPORTANT:  Your original files are available to you when you upload your revised manuscript.  Please delete any redundant files before completing the submission.
+
+Because we are trying to facilitate timely publication of manuscripts submitted to the Journal of Functional Programming, your revised manuscript should be uploaded as soon as possible.  If it is not possible for you to submit your revision in a reasonable amount of time, say six weeks, we may have to consider your paper as a new submission. Please let me know if this timescale is not feasible.
+
+Once again, thank you for submitting your manuscript to the Journal of Functional Programming and I look forward to receiving your revision.
+
+Sincerely,
+Prof. Functional Pearls
+Journal of Functional Programming
+prof-pearls@online.de
+
+Referees' Comments to Author:
+Referee: 1
+
+Comments to the Author
+Concerning the five general comments and suggestions I made in my
+review of the originally submitted paper:
+
+1. ... could helpfully provide a little more by way of references
+to assist the proverbial 'new reader'
+
+Indeed, more references of this kind are now included, and
+that is helpful.
+
+2. ... some reference might be made to previous explorations of fold
+expressiveness and the applicability of unfold
+
+You have not chosen to adopt this suggestion.  Fair enough.
+
+3. ... algorithm that runs in linear-time [so you have] tested it on a
+range of large inputs.  It would be nice to have this confirmation
+
+This has been done.  Brief details are given on p9 including measured
+run-times.
+
+4. ... perhaps the methods you used for this derivation would also be
+applicable to a wider class of problems involving segments and inverses.
+Could you say something about this wider class, with examples?
+Where does the boundary lie between feasible and infeasible problems?
+
+There are some brief hints in Section 7.
+
+5. ... I found it distracting to have punctation such as commas,
+conjunctions and stops after equations that are part of function
+specifications or declarations
+
+The punctuation is still there, and I still find it distracting!
+However, this is a matter of editorial preference.
+
+Typographical errors and suggested local rephrasing:
+(Key: / /insert, [ ] delete, [ -> ] replace)
+
+p1 "it involves /a combination of/ techniques"  (Abstract)
+p3 "every suffix[es] ... each of them /is/ rather costly"
+p5 after "appears too early" instead of the further sentence
+  I suggest "--- the result is undefined."
+p6 "[More discussions will be given -> We shall discuss this issue further]"
+p6 "[such that we can get -> in order to obtain]"
+p7 justify each step in the calculation, as you do elsewhere
+p7 "th[os]e forests that match[es]"
+p7 "the [the]"
+p8 "/I/n summary"
+p8 "done in /this/ section ... [adding that -> this extra]"
+p9 "[It is -> Generalisations are] common
+p9 "for each suffix[es]"
+p9 "[common among -> commonly adopted by imperative] programmers"
+p10 "advic[es]"
+
+
+Referee: 2
+
+Comments to the Author
+
+The paper is much improved by the revision, but, as was to be expected in such a drastic rewrite, some new errors and other issues arose.
+
+In line 59, replace "let" by "letting". Or replace ", we have" by ". Then we have".
+
+In line 99 "every" should be "all".
+
+Around line 122 I got confused. Is the fusion condition in this case not just simply map parse (map (x:) xss) = g' x (map parse xss) ? The more involved equation given is not type correct. The l.h.s. is a list, while the r.h.s. has type Maybe Tree.
+
+Assuming the simpler condition is intended, I did not see why parse (x : xs) = g'' x (parse xs) of line 124 is a necessary condition.
+
+It is easy to see though that the answer to the question "Is that possible?" in line 125 is "no". For if we take xs0 = ")(" and "xs1" = ")", both parse xs0 and parse xs1 are equal to Nothing, so for the equation to hold it needs to be the case that parse (x : xs0) = g'' x Nothing = parse (x : xs1) for any x. But if we take x = '(', we have parse (x : xs0) = parse "()(" = Nothing, while parse (x : xs1) = parse "()" = Just (Bin Nil Nil). We do not have to wait till around line 150 to see that some generalisation will be needed that treats (some) unbalanced inputs in a less cavalier way. An argument can be made for presenting the generalization to prF -- motivated by the observation that the answer is "no" -- in a separate section between Section 2 and the current Section 3, by splitting the (long) current Section 4 and promoting the first part (up to line 204) to the new Section 3. The remaining part, which then becomes Section 5, can focus purely on the function inversion.
+
+In line 232+, use "More discussion" (singular).
+
+The step from line 262 to 264 may be a "routine calculation", but I found it far from obvious. I did not see where the "other properties" of line 263 are explained. The calculation, whether routine or not, should be given more explicitly.
+
+Line 317 has "present in the the". I think this is meant to be "be the". It may be easy to "see intuitively" why this is so, but can this be proved more formally?
+
+At the end of line 326, "n" should be "In".
+
+In line 336, "section" should be "this section".
+
+In line 389, "This is a common technique" reads better than "It is common".
+
+In line 399, "parsing SLR(1) grammars" should be "parsing SLR(1) languages".
