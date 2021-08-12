@@ -34,3 +34,13 @@ icfp/comment.cut
 jfp2/LongParens.pdf
 
 jfp2/LongParens.tex
+
+code/lbp
+
+*.hi
+
+*.o
+
+code/samplegen
+
+code/samples/
